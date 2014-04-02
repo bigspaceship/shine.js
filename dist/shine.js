@@ -171,19 +171,21 @@ exports.Shadow.prototype.drawShadows = function(shadows) {
  * Adds DOM event listeners for resize, scroll and load
  */
 exports.Shadow.prototype.enableAutoUpdates = function() {
-  document.addEventListener('resize', this.fnHandleViewportUpdate);
-  document.addEventListener('load', this.fnHandleViewportUpdate);
-  window.addEventListener('resize', this.fnHandleViewportUpdate);
-  window.addEventListener('scroll', this.fnHandleViewportUpdate);
+  this.disableAutoUpdates();
+  document.addEventListener('resize', this.fnHandleViewportUpdate, false);
+  document.addEventListener('load', this.fnHandleViewportUpdate, false);
+  window.addEventListener('resize', this.fnHandleViewportUpdate, false);
+  window.addEventListener('scroll', this.fnHandleViewportUpdate, false);
 };
 
 /**
  * Removes DOM event listeners for resize, scroll and load
  */
 exports.Shadow.prototype.disableAutoUpdates = function() {
-  window.removeEventListener('resize', this.fnHandleViewportUpdate);
-  window.removeEventListener('scroll', this.fnHandleViewportUpdate);
-  window.removeEventListener('load', this.fnHandleViewportUpdate);
+  document.removeEventListener('resize', this.fnHandleViewportUpdate, false);
+  document.removeEventListener('load', this.fnHandleViewportUpdate, false);
+  window.removeEventListener('resize', this.fnHandleViewportUpdate, false);
+  window.removeEventListener('scroll', this.fnHandleViewportUpdate, false);
 };
 
 /**
@@ -382,11 +384,38 @@ exports.Shine = function(domElement, optClassPrefix, optShadowProperty) {
   this.light = new exports.Light();
   this.shadows = [];
 
-  this.fnDrawHandler = function(){
+  this.fnDrawHandler = function() {
     self.draw();
   };
 
   this.init(optClassPrefix, optShadowProperty);
+};
+
+/**
+ * Adds DOM event listeners to automatically update all properties.
+ */
+exports.Shine.prototype.enableAutoUpdates = function() {
+  this.disableAutoUpdates();
+
+  window.addEventListener('scroll', this.fnDrawHandler, false);
+  window.addEventListener('resize', this.fnDrawHandler, false);
+
+  for (var i = this.shadows.length - 1; i >= 0; i--) {
+    var shadow = this.shadows[i];
+    shadow.enableAutoUpdates();
+  }
+};
+/**
+ * Removes DOM event listeners to automatically update all properties.
+ */
+exports.Shine.prototype.disableAutoUpdates = function() {
+  window.removeEventListener('scroll', this.fnDrawHandler, false);
+  window.removeEventListener('resize', this.fnDrawHandler, false);
+
+  for (var i = this.shadows.length - 1; i >= 0; i--) {
+    var shadow = this.shadows[i];
+    shadow.disableAutoUpdates();
+  }
 };
 
 /**
@@ -417,8 +446,7 @@ exports.Shine.prototype.init = function(classPrefix, shadowProperty) {
     this.shadows.push(shadow);
   }
 
-  window.addEventListener('scroll', this.fnDrawHandler);
-  window.addEventListener('resize', this.fnDrawHandler);
+  this.enableAutoUpdates();
 };
 
 /**

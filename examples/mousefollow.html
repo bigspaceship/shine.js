@@ -30,20 +30,14 @@
       shine.domElement.style.top = 0.5 * (window.innerHeight - shine.domElement.offsetHeight) + 'px';
 
       function handleMouseMove(event) {
-        shine.light.position.x = event.clientX * 0.5;
-        shine.light.position.y = event.clientY * 0.5;
-        draw();
-      }
-
-      function draw(){
+        shine.light.position.x = event.clientX;
+        shine.light.position.y = event.clientY;
         shine.draw();
       }
 
-      window.addEventListener('resize', draw);
-      window.addEventListener('scroll', draw);
       window.addEventListener('mousemove', handleMouseMove);
 
-      draw();
+      shine.draw();
     </script>
   </body>
 </html>
