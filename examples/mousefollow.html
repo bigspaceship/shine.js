@@ -6,14 +6,15 @@
         Custom styles
        */
       #headline {
+        position: absolute;
+        padding: 0.5em;
+        margin: 0;
+
         text-align: center;
-        color: white;
+        color: #fcfcfc;
         text-transform: uppercase;
         font-size: 8em;
         font-family: sans-serif;
-      }
-      .shine-letter {
-        padding: 0.1em;
       }
     </style>
     <script type="text/javascript" src="../dist/shine.min.js"></script>
@@ -26,8 +27,6 @@
       // use new shinejs.Shine(...) if Shine is already defined somewhere else
       // var shine = new shinejs.Shine(document.getElementById('headline'));
       var shine = new Shine(document.getElementById('headline'));
-      shine.domElement.style.left = 0.5 * (window.innerWidth - shine.domElement.offsetWidth) + 'px';
-      shine.domElement.style.top = 0.5 * (window.innerHeight - shine.domElement.offsetHeight) + 'px';
 
       function handleMouseMove(event) {
         shine.light.position.x = event.clientX;
@@ -35,10 +34,16 @@
         shine.draw();
       }
 
-      window.addEventListener('mousemove', handleMouseMove);
+      function handleViewportUpdates(){
+        shine.domElement.style.left = 0.5 * (window.innerWidth - shine.domElement.offsetWidth) + 'px';
+        shine.domElement.style.top = 0.5 * (window.innerHeight - shine.domElement.offsetHeight) + 'px';
+      }
 
+      window.addEventListener('mousemove', handleMouseMove, false);
+      window.addEventListener('resize', handleViewportUpdates, false);
+
+      handleViewportUpdates();
       shine.draw();
     </script>
   </body>
 </html>
-
