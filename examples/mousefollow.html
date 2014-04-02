@@ -1,0 +1,50 @@
+<html>
+  <head>
+    <title>Shine Demo</title>
+    <style type="text/css">
+      /*
+        Custom styles
+       */
+      #headline {
+        text-align: center;
+        color: white;
+        text-transform: uppercase;
+        font-size: 8em;
+        font-family: sans-serif;
+      }
+      .shine-letter {
+        padding: 0.1em;
+      }
+    </style>
+    <script type="text/javascript" src="../dist/shine.min.js"></script>
+  </head>
+  <body>
+    <h1 id="headline">Shine Mouse-Follow Demo</h1>
+
+    <script type="text/javascript">
+
+      // use new shinejs.Shine(...) if Shine is already defined somewhere else
+      // var shine = new shinejs.Shine(document.getElementById('headline'));
+      var shine = new Shine(document.getElementById('headline'));
+      shine.domElement.style.left = 0.5 * (window.innerWidth - shine.domElement.offsetWidth) + 'px';
+      shine.domElement.style.top = 0.5 * (window.innerHeight - shine.domElement.offsetHeight) + 'px';
+
+      function handleMouseMove(event) {
+        shine.light.position.x = event.clientX * 0.5;
+        shine.light.position.y = event.clientY * 0.5;
+        draw();
+      }
+
+      function draw(){
+        shine.draw();
+      }
+
+      window.addEventListener('resize', draw);
+      window.addEventListener('scroll', draw);
+      window.addEventListener('mousemove', handleMouseMove);
+
+      draw();
+    </script>
+  </body>
+</html>
+
