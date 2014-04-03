@@ -14,5 +14,8 @@
   "undef": true,
   "strict": false,
   "trailing": true,
-  "smarttabs": true
+  "smarttabs": true,
+  "globals": {
+    "Shine": false
+  }
 }

@@ -310,7 +310,10 @@ module.exports = function (grunt) {
       all: [
         'Gruntfile.js',
         '<%= yeoman.app %>/js/**/*.js',
-        'test/spec/**/*.js'
+        'test/spec/**/*.js',
+        '!<%= yeoman.app %>/js/**/*.min.js',
+        '!<%= yeoman.app %>/js/**/shine.js',
+        '!<%= yeoman.app %>/js/**/shine.min.js'
       ]
     },
     csslint: {
@@ -319,8 +322,8 @@ module.exports = function (grunt) {
       },
       check: {
         src: [
-          '<%= yeoman.app %>/css/**/*.css',
-          '<%= yeoman.app %>/_scss/**/*.scss'
+          '<%= yeoman.app %>/css/**/*.css'//,
+          // '<%= yeoman.app %>/_scss/**/*.scss'
         ]
       }
     },
