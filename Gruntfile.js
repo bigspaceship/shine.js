@@ -188,7 +188,7 @@ module.exports = function (grunt) {
     },
     usemin: {
       options: {
-        assetsDirs: '<%= yeoman.dist %>',
+        assetsDirs: '<%= yeoman.dist %>'
       },
       html: ['<%= yeoman.dist %>/**/*.html'],
       css: ['<%= yeoman.dist %>/css/**/*.css']
@@ -262,6 +262,14 @@ module.exports = function (grunt) {
             //'_bower_components/jquery/jquery.js',
             //'favicon.ico',
             //'apple-touch*.png'
+          ],
+          dest: '<%= yeoman.dist %>'
+        }, {
+          expand: true,
+          dot: true,
+          cwd: '.tmp',
+          src: [
+            'css/**/*'
           ],
           dest: '<%= yeoman.dist %>'
         }]
@@ -381,10 +389,10 @@ module.exports = function (grunt) {
     'jekyll:dist',
     'concurrent:dist',
     // 'useminPrepare',
-    'concat',
+    // 'concat',
     'autoprefixer:dist',
-    'cssmin',
-    'uglify',
+    // 'cssmin',
+    // 'uglify',
     'imagemin',
     'svgmin',
     // 'filerev',
