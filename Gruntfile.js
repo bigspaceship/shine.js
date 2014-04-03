@@ -342,8 +342,8 @@ module.exports = function (grunt) {
         'jekyll:server'
       ],
       dist: [
-        'sass:dist',
-        'copy:dist'
+        // 'sass:dist',
+        // 'copy:dist'
       ]
     }
   });
@@ -387,7 +387,9 @@ module.exports = function (grunt) {
     'clean',
     // Jekyll cleans files from the target directory, so must run first
     'jekyll:dist',
-    'concurrent:dist',
+    // 'concurrent:dist',
+    'sass:dist',
+    'copy:dist',
     // 'useminPrepare',
     // 'concat',
     'autoprefixer:dist',
