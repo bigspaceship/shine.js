@@ -1,0 +1,25 @@
+* {
+  margin: 0;
+  padding: 0;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box; }
+
+html {
+  font-family: "Droid Sans", sans-serif; }
+
+header,
+footer,
+section {
+  width: 100%;
+  padding: 4em; }
+
+h1, h2, h3, h4, h5, h6 {
+  line-height: 1em;
+  text-align: center; }
+
+.large {
+  font-size: 8em; }
+  .large.light {
+    color: #fcfcfc; }
+  .large.dark {
+    color: #3c3c3c; }
