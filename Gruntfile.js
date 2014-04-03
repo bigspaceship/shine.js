@@ -380,7 +380,7 @@ module.exports = function (grunt) {
     // Jekyll cleans files from the target directory, so must run first
     'jekyll:dist',
     'concurrent:dist',
-    'useminPrepare',
+    // 'useminPrepare',
     'concat',
     'autoprefixer:dist',
     'cssmin',
