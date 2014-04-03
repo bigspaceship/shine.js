@@ -159,7 +159,7 @@ module.exports = function (grunt) {
     jekyll: {
       options: {
         bundleExec: false,
-        config: '_config.build.yml, _config.yml',
+        config: '_config.yml,_config.build.yml',
         src: '<%= yeoman.app %>'
       },
       dist: {
@@ -399,7 +399,7 @@ module.exports = function (grunt) {
     'svgmin',
     // 'filerev',
     // 'usemin',
-    // 'htmlmin'
+    'htmlmin'
     ]);
 
   grunt.registerTask('deploy', [

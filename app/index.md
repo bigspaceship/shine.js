@@ -12,10 +12,8 @@ title: shine.js
 {% include scripts/mouse-follow.js %}
 {% endhighlight %}
   
-  <script>//
-  (function(){
+  <script>(function(){
     {% include scripts/mouse-follow.js %}
-  }());
-  //</script>
+  }());</script>
 
 </div>
