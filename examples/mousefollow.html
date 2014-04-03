@@ -20,6 +20,10 @@
     <script type="text/javascript" src="../dist/shine.min.js"></script>
   </head>
   <body>
+    <button data-text="Shine Mouse-Follow Demo">Change Text</button>
+    <button data-text="Hello World">Change Text</button>
+    <button data-text="Lorem Ipsum">Change Text</button>
+
     <h1 id="headline">Shine Mouse-Follow Demo</h1>
 
     <script type="text/javascript">
@@ -39,11 +43,21 @@
         shine.domElement.style.top = 0.5 * (window.innerHeight - shine.domElement.offsetHeight) + 'px';
       }
 
+      function handleTextButtonClick(event) {
+        var text = event.target.dataset.text;
+        shine.update(text);
+        handleViewportUpdates();
+      }
+
       window.addEventListener('mousemove', handleMouseMove, false);
       window.addEventListener('resize', handleViewportUpdates, false);
 
+      var textButtons = document.querySelectorAll('[data-text]');
+      for (var i = 0; i < textButtons.length; i++) {
+        textButtons[i].addEventListener('click', handleTextButtonClick, false);
+      }
+
       handleViewportUpdates();
-      shine.draw();
     </script>
   </body>
 </html>
