@@ -1,7 +1,7 @@
 (function(){
   var shines = [];
   var shineElements = document.querySelectorAll('.shine');
-  console.log(shineElements);
+
   for (var i = 0; i < shineElements.length; i++) {
     var element = shineElements[i];
     var rect = element.getBoundingClientRect();
@@ -10,6 +10,5 @@
     shine.light.position.y = rect.top - rect.height;
     shine.draw();
     shines.push(shine);
-    console.log(shine);
   }
 })();
