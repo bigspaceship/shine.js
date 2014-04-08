@@ -71,8 +71,6 @@ exports.Point.prototype.delta = function(p) {
  * @param {!HTMLElement} domElement
  */
 exports.Shadow = function(domElement) {
-  var self = this;
-
   /** @type {number} */
   this.stepSize = 8;
   /** @type {number} */
@@ -109,9 +107,7 @@ exports.Shadow = function(domElement) {
    * @const
    * @type {Function}
    */
-  this.fnHandleViewportUpdate = function(){
-    self.handleViewportUpdate();
-  };
+  this.fnHandleViewportUpdate = null;
 
   this.enableAutoUpdates();
   this.handleViewportUpdate();
@@ -181,7 +177,10 @@ exports.Shadow.prototype.enableAutoUpdates = function() {
   this.disableAutoUpdates();
 
   // store reference fore more efficient minification
-  var fnHandleViewportUpdate = this.fnHandleViewportUpdate;
+  var self = this;
+  var fnHandleViewportUpdate = this.fnHandleViewportUpdate = function(){
+    self.handleViewportUpdate();
+  };
 
   document.addEventListener('resize', fnHandleViewportUpdate, false);
   document.addEventListener('load', fnHandleViewportUpdate, false);
@@ -196,6 +195,13 @@ exports.Shadow.prototype.disableAutoUpdates = function() {
 
   // store reference fore more efficient minification
   var fnHandleViewportUpdate = this.fnHandleViewportUpdate;
+
+  // old FF versions break when removing listeners that haven't been added
+  if (!fnHandleViewportUpdate) {
+    return;
+  }
+
+  this.fnHandleViewportUpdate = null;
 
   document.removeEventListener('resize', fnHandleViewportUpdate, false);
   document.removeEventListener('load', fnHandleViewportUpdate, false);
@@ -436,8 +442,6 @@ exports.StyleInjector.prototype.inject = function(css, doc) {
  *                                     Defaults to 'textShadow'.
  */
 exports.Shine = function(domElement, optClassPrefix, optShadowProperty) {
-  var self = this;
-
   if (!domElement) {
     throw new Error('No valid DOM element passed as first parameter');
   }
@@ -453,9 +457,7 @@ exports.Shine = function(domElement, optClassPrefix, optShadowProperty) {
 
   this.areAutoUpdatesEnabled = true;
 
-  this.fnDrawHandler = function() {
-    self.draw();
-  };
+  this.fnDrawHandler = null;
 
   this.update();
 };
@@ -527,7 +529,10 @@ exports.Shine.prototype.enableAutoUpdates = function() {
   this.areAutoUpdatesEnabled = true;
 
   // store reference fore more efficient minification
-  var fnDrawHandler = this.fnDrawHandler;
+  var self = this;
+  var fnDrawHandler = this.fnDrawHandler = function(){
+    self.draw();
+  };
 
   window.addEventListener('scroll', fnDrawHandler, false);
   window.addEventListener('resize', fnDrawHandler, false);
@@ -545,6 +550,12 @@ exports.Shine.prototype.disableAutoUpdates = function() {
 
   // store reference fore more efficient minification
   var fnDrawHandler = this.fnDrawHandler;
+
+  if (!fnDrawHandler) {
+    return;
+  }
+
+  this.fnDrawHandler = null;
 
   window.removeEventListener('scroll', fnDrawHandler, false);
   window.removeEventListener('resize', fnDrawHandler, false);
