@@ -1,4 +1,4 @@
-/*! shine.js - v0.1.0 - 2014-04-03
+/*! shine.js - v0.1.0 - 2014-04-08
 * http://bigspaceship.github.io/shine.js
 * Copyright (c) 2014 Big Spaceship; Licensed MIT */
 'use strict';
@@ -253,29 +253,102 @@ exports.Splitter = function(domElement, optClassPrefix) {
   /**
    * @type {!Array.<HTMLElement>}
    */
-  this.letterElements = [];
+  this.elements = [];
+
+  /**
+   * @type {string}
+   */
+  this.text = '';
 };
 
 /**
  * Performs the actual split
+ * @param {?string=} optText Optional text to replace the content with
  */
-exports.Splitter.prototype.split = function() {
+exports.Splitter.prototype.split = function(optText) {
 
+  this.text = optText || this.text;
   this.wordElements.length = 0;
-  this.letterElements.length = 0;
+  this.elements.length = 0;
 
-  // store references for more efficient minification
-  var domElement = this.domElement;
-  var maskElement = this.maskElement;
-  var wrapperElement = this.wrapperElement;
-  var classPrefix = this.classPrefix;
+  this.wrapperElement.className = this.classPrefix + 'wrapper';
+  this.wrapperElement.innerHTML = '';
 
+  var hasTextOnly = this.hasTextOnly(this.domElement);
+
+  if (optText) {
+    this.domElement.textContent = this.text;
+  }
+
+  if (hasTextOnly) {
+    this.splitText(this.domElement, this.maskElement, this.wrapperElement, this.classPrefix);
+  } else {
+    this.splitChildren(this.domElement, this.maskElement, this.wrapperElement, this.classPrefix);
+  }
+};
+
+/**
+ * Checks whether a DOM element only contains childNodes of type TEXT_NODE (3).
+ * @param {HTMLElement} domElement
+ * @return {Boolean}
+ */
+exports.Splitter.prototype.hasTextOnly = function(domElement) {
+  var childNodes = domElement.childNodes;
+  console.log(childNodes);
+
+  if (!childNodes || childNodes.length === 0) {
+    return true;
+  }
+
+  for (var i = 0; i < childNodes.length; i++) {
+    if (childNodes[i].nodeType !== 3) {
+      return false;
+    }
+  }
+
+  return true;
+};
+
+/**
+ * Assigns letter elements to a DOM element's children.
+ * @param {HTMLElement} domElement
+ * @param {HTMLElement} maskElement
+ * @param {HTMLElement} wrapperElement
+ * @param {string} classPrefix
+ */
+exports.Splitter.prototype.splitChildren = function(domElement, maskElement, wrapperElement, classPrefix) {
+  var childNodes = domElement.childNodes;
+
+  for (var i = 0; i < childNodes.length; i++) {
+    var child = childNodes[i];
+    // see https://developer.mozilla.org/en-US/docs/Web/API/Node.nodeType
+    if (child.nodeType !== 1) {
+      continue;
+    }
+    child.className += ' ' + classPrefix + 'letter';
+    wrapperElement.appendChild(child);
+    this.elements.push(child);
+  }
+
+  maskElement.innerHTML = wrapperElement.innerHTML;
+  maskElement.className = classPrefix + 'mask';
+  wrapperElement.appendChild(maskElement);
+
+  domElement.innerHTML = '';
+  domElement.appendChild(wrapperElement);
+};
+
+/**
+ * Splits a DOM element into word and letter elements and masks them.
+ * @param {HTMLElement} domElement
+ * @param {HTMLElement} maskElement
+ * @param {HTMLElement} wrapperElement
+ * @param {string} classPrefix
+ */
+exports.Splitter.prototype.splitText = function(domElement, maskElement, wrapperElement, classPrefix) {
   var text = domElement.textContent;
   var numLetters = text.length;
   var wordElement = null;
-
-  wrapperElement.className = classPrefix + 'wrapper';
-  wrapperElement.innerHTML = '';
 
   for (var i = 0; i < numLetters; i++) {
     var letter = text.charAt(i);
@@ -301,7 +374,7 @@ exports.Splitter.prototype.split = function() {
     var letterElement = document.createElement('span');
     letterElement.innerHTML = letter;
     letterElement.className = classPrefix + 'letter';
-    this.letterElements.push(letterElement);
+    this.elements.push(letterElement);
 
     wordElement.appendChild(letterElement);
 
@@ -395,24 +468,34 @@ exports.Shine = function(domElement, optClassPrefix, optShadowProperty) {
     throw new Error('No valid DOM element passed as first parameter');
   }
 
-  if (domElement.children && domElement.children.length > 0) {
-    throw new Error('Shine only works on elements with text content. ' +
-      'The DOM element cannot have any children.');
-  }
-
   this.classPrefix = optClassPrefix || 'shine-';
   this.shadowProperty = optShadowProperty || 'textShadow';
   this.domElement = domElement;
   this.light = new exports.Light();
   this.shadows = [];
   this.splitter = new exports.Splitter(domElement, this.classPrefix);
-  this.text = this.domElement.textContent;
+
+  this.areAutoUpdatesEnabled = true;
 
   this.fnDrawHandler = function() {
     self.draw();
   };
 
   this.update();
+};
+
+/**
+ * Releases all resources and removes event listeners. Destroyed instances
+ * can't be reused and must be discarded.
+ */
+exports.Shine.prototype.destroy = function() {
+  this.disableAutoUpdates();
+
+  this.light = null;
+  this.shadows = null;
+  this.splitter = null;
+
+  this.fnDrawHandler = null;
 };
 
 /**
@@ -436,25 +519,25 @@ exports.Shine.prototype.draw = function() {
  *                           will be used.
  */
 exports.Shine.prototype.update = function(optText) {
+  var wereAutoUpdatesEnabled = this.areAutoUpdatesEnabled;
   this.disableAutoUpdates();
 
   exports.StyleInjector.getInstance().inject(this.getCSS());
 
   this.shadows.length = 0;
 
-  this.text = optText || this.text;
-  this.domElement.textContent = this.text;
+  this.splitter.split(optText);
 
-  this.splitter.split();
-
-  for (var j = 0; j < this.splitter.letterElements.length; j++) {
-    var letterElement = this.splitter.letterElements[j];
-    var shadow = new exports.Shadow(letterElement);
+  for (var j = 0; j < this.splitter.elements.length; j++) {
+    var element = this.splitter.elements[j];
+    var shadow = new exports.Shadow(element);
     shadow.shadowProperty = this.shadowProperty;
     this.shadows.push(shadow);
   }
 
-  this.enableAutoUpdates();
+  if (wereAutoUpdatesEnabled) {
+    this.enableAutoUpdates();
+  }
   this.draw();
 };
 
@@ -463,6 +546,7 @@ exports.Shine.prototype.update = function(optText) {
  */
 exports.Shine.prototype.enableAutoUpdates = function() {
   this.disableAutoUpdates();
+  this.areAutoUpdatesEnabled = true;
 
   // store reference fore more efficient minification
   var windowAddEventListener = window.addEventListener;
@@ -480,6 +564,8 @@ exports.Shine.prototype.enableAutoUpdates = function() {
  * Removes DOM event listeners to automatically update all properties.
  */
 exports.Shine.prototype.disableAutoUpdates = function() {
+  this.areAutoUpdatesEnabled = false;
+
   // store reference fore more efficient minification
   var windowRemoveEventListener = window.removeEventListener;
   var fnDrawHandler = this.fnDrawHandler;
