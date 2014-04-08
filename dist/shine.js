@@ -182,13 +182,11 @@ exports.Shadow.prototype.enableAutoUpdates = function() {
 
   // store reference fore more efficient minification
   var fnHandleViewportUpdate = this.fnHandleViewportUpdate;
-  var documentAddEventListener = document.addEventListener;
-  var windowAddEventListener = window.addEventListener;
 
-  documentAddEventListener('resize', fnHandleViewportUpdate, false);
-  documentAddEventListener('load', fnHandleViewportUpdate, false);
-  windowAddEventListener('resize', fnHandleViewportUpdate, false);
-  windowAddEventListener('scroll', fnHandleViewportUpdate, false);
+  document.addEventListener('resize', fnHandleViewportUpdate, false);
+  document.addEventListener('load', fnHandleViewportUpdate, false);
+  window.addEventListener('resize', fnHandleViewportUpdate, false);
+  window.addEventListener('scroll', fnHandleViewportUpdate, false);
 };
 
 /**
@@ -198,13 +196,11 @@ exports.Shadow.prototype.disableAutoUpdates = function() {
 
   // store reference fore more efficient minification
   var fnHandleViewportUpdate = this.fnHandleViewportUpdate;
-  var documentRemoveEventListener = document.removeEventListener;
-  var windowRemoveEventListener = window.removeEventListener;
 
-  documentRemoveEventListener('resize', fnHandleViewportUpdate, false);
-  documentRemoveEventListener('load', fnHandleViewportUpdate, false);
-  windowRemoveEventListener('resize', fnHandleViewportUpdate, false);
-  windowRemoveEventListener('scroll', fnHandleViewportUpdate, false);
+  document.removeEventListener('resize', fnHandleViewportUpdate, false);
+  document.removeEventListener('load', fnHandleViewportUpdate, false);
+  window.removeEventListener('resize', fnHandleViewportUpdate, false);
+  window.removeEventListener('scroll', fnHandleViewportUpdate, false);
 };
 
 /**
@@ -531,11 +527,10 @@ exports.Shine.prototype.enableAutoUpdates = function() {
   this.areAutoUpdatesEnabled = true;
 
   // store reference fore more efficient minification
-  var windowAddEventListener = window.addEventListener;
   var fnDrawHandler = this.fnDrawHandler;
 
-  windowAddEventListener('scroll', fnDrawHandler, false);
-  windowAddEventListener('resize', fnDrawHandler, false);
+  window.addEventListener('scroll', fnDrawHandler, false);
+  window.addEventListener('resize', fnDrawHandler, false);
 
   for (var i = this.shadows.length - 1; i >= 0; i--) {
     var shadow = this.shadows[i];
@@ -549,11 +544,10 @@ exports.Shine.prototype.disableAutoUpdates = function() {
   this.areAutoUpdatesEnabled = false;
 
   // store reference fore more efficient minification
-  var windowRemoveEventListener = window.removeEventListener;
   var fnDrawHandler = this.fnDrawHandler;
 
-  windowRemoveEventListener('scroll', fnDrawHandler, false);
-  windowRemoveEventListener('resize', fnDrawHandler, false);
+  window.removeEventListener('scroll', fnDrawHandler, false);
+  window.removeEventListener('resize', fnDrawHandler, false);
 
   for (var i = this.shadows.length - 1; i >= 0; i--) {
     var shadow = this.shadows[i];
