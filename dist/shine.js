@@ -1,4 +1,4 @@
-/*! shine.js - v0.1.0 - 2014-04-02
+/*! shine.js - v0.1.0 - 2014-04-08
 * http://bigspaceship.github.io/shine.js
 * Copyright (c) 2014 Big Spaceship; Licensed MIT */
 'use strict';
@@ -71,6 +71,8 @@ exports.Point.prototype.delta = function(p) {
  * @param {!HTMLElement} domElement
  */
 exports.Shadow = function(domElement) {
+  var self = this;
+
   /** @type {number} */
   this.stepSize = 8;
   /** @type {number} */
@@ -103,8 +105,13 @@ exports.Shadow = function(domElement) {
   /** @type {!exports.Color} */
   this.shadowRGB = new exports.Color(0, 0, 0);
 
-  /** @type {!Function} */
-  this.fnHandleViewportUpdate = this.handleViewportUpdate.bind(this);
+  /**
+   * @const
+   * @type {Function}
+   */
+  this.fnHandleViewportUpdate = function(){
+    self.handleViewportUpdate();
+  };
 
   this.enableAutoUpdates();
   this.handleViewportUpdate();
@@ -172,20 +179,32 @@ exports.Shadow.prototype.drawShadows = function(shadows) {
  */
 exports.Shadow.prototype.enableAutoUpdates = function() {
   this.disableAutoUpdates();
-  document.addEventListener('resize', this.fnHandleViewportUpdate, false);
-  document.addEventListener('load', this.fnHandleViewportUpdate, false);
-  window.addEventListener('resize', this.fnHandleViewportUpdate, false);
-  window.addEventListener('scroll', this.fnHandleViewportUpdate, false);
+
+  // store reference fore more efficient minification
+  var fnHandleViewportUpdate = this.fnHandleViewportUpdate;
+  var documentAddEventListener = document.addEventListener;
+  var windowAddEventListener = window.addEventListener;
+
+  documentAddEventListener('resize', fnHandleViewportUpdate, false);
+  documentAddEventListener('load', fnHandleViewportUpdate, false);
+  windowAddEventListener('resize', fnHandleViewportUpdate, false);
+  windowAddEventListener('scroll', fnHandleViewportUpdate, false);
 };
 
 /**
  * Removes DOM event listeners for resize, scroll and load
  */
 exports.Shadow.prototype.disableAutoUpdates = function() {
-  document.removeEventListener('resize', this.fnHandleViewportUpdate, false);
-  document.removeEventListener('load', this.fnHandleViewportUpdate, false);
-  window.removeEventListener('resize', this.fnHandleViewportUpdate, false);
-  window.removeEventListener('scroll', this.fnHandleViewportUpdate, false);
+
+  // store reference fore more efficient minification
+  var fnHandleViewportUpdate = this.fnHandleViewportUpdate;
+  var documentRemoveEventListener = document.removeEventListener;
+  var windowRemoveEventListener = window.removeEventListener;
+
+  documentRemoveEventListener('resize', fnHandleViewportUpdate, false);
+  documentRemoveEventListener('load', fnHandleViewportUpdate, false);
+  windowRemoveEventListener('resize', fnHandleViewportUpdate, false);
+  windowRemoveEventListener('scroll', fnHandleViewportUpdate, false);
 };
 
 /**
@@ -234,18 +253,78 @@ exports.Splitter = function(domElement, optClassPrefix) {
   /**
    * @type {!Array.<HTMLElement>}
    */
-  this.letterElements = [];
+  this.elements = [];
 
-  this.split();
+  /**
+   * @type {string}
+   */
+  this.text = '';
 };
 
 /**
  * Performs the actual split
+ * @param {?string=} optText Optional text to replace the content with
+ * @param {?boolean=} preserveChildren Preserves the nodes children as opposed
+ *                                     to converting its content to text-only.
  */
-exports.Splitter.prototype.split = function() {
-  this.wrapperElement.className = this.classPrefix + 'wrapper';
+exports.Splitter.prototype.split = function(optText, preserveChildren) {
 
-  var text = this.domElement.textContent;
+  this.text = optText || this.text;
+  this.wordElements.length = 0;
+  this.elements.length = 0;
+
+  this.wrapperElement.className = this.classPrefix + 'wrapper';
+  this.wrapperElement.innerHTML = '';
+
+  if (optText) {
+    this.domElement.textContent = this.text;
+  }
+
+  if (preserveChildren) {
+    this.splitChildren(this.domElement, this.maskElement, this.wrapperElement, this.classPrefix);
+  } else {
+    this.splitText(this.domElement, this.maskElement, this.wrapperElement, this.classPrefix);
+  }
+};
+
+/**
+ * Assigns letter elements to a DOM element's children.
+ * @param {HTMLElement} domElement
+ * @param {HTMLElement} maskElement
+ * @param {HTMLElement} wrapperElement
+ * @param {string} classPrefix
+ */
+exports.Splitter.prototype.splitChildren = function(domElement, maskElement, wrapperElement, classPrefix) {
+  var childNodes = domElement.childNodes;
+
+  for (var i = 0; i < childNodes.length; i++) {
+    var child = childNodes[i];
+    // see https://developer.mozilla.org/en-US/docs/Web/API/Node.nodeType
+    if (child.nodeType !== 1) {
+      continue;
+    }
+    child.className += ' ' + classPrefix + 'letter';
+    wrapperElement.appendChild(child);
+    this.elements.push(child);
+  }
+
+  maskElement.innerHTML = wrapperElement.innerHTML;
+  maskElement.className = classPrefix + 'mask';
+  wrapperElement.appendChild(maskElement);
+
+  domElement.innerHTML = '';
+  domElement.appendChild(wrapperElement);
+};
+
+/**
+ * Splits a DOM element into word and letter elements and masks them.
+ * @param {HTMLElement} domElement
+ * @param {HTMLElement} maskElement
+ * @param {HTMLElement} wrapperElement
+ * @param {string} classPrefix
+ */
+exports.Splitter.prototype.splitText = function(domElement, maskElement, wrapperElement, classPrefix) {
+  var text = domElement.textContent;
   var numLetters = text.length;
   var wordElement = null;
 
@@ -254,26 +333,26 @@ exports.Splitter.prototype.split = function() {
 
     if (!wordElement) {
       wordElement = document.createElement('span');
-      wordElement.className = this.classPrefix + 'word';
+      wordElement.className = classPrefix + 'word';
 
-      this.wrapperElement.appendChild(wordElement);
+      wrapperElement.appendChild(wordElement);
       this.wordElements.push(wordElement);
     }
 
     // skip whitespace characters and create new word
     if (letter.match(/[\s]/)) {
       var spacerElement = document.createElement('span');
-      spacerElement.className = this.classPrefix + 'spacer';
+      spacerElement.className = classPrefix + 'spacer';
       spacerElement.innerHTML = letter;
-      this.wrapperElement.appendChild(spacerElement);
+      wrapperElement.appendChild(spacerElement);
       wordElement = null;
       continue;
     }
 
     var letterElement = document.createElement('span');
     letterElement.innerHTML = letter;
-    letterElement.className = this.classPrefix + 'letter';
-    this.letterElements.push(letterElement);
+    letterElement.className = classPrefix + 'letter';
+    this.elements.push(letterElement);
 
     wordElement.appendChild(letterElement);
 
@@ -282,17 +361,12 @@ exports.Splitter.prototype.split = function() {
     }
   }
 
-  this.maskElement.innerHTML = this.wrapperElement.innerHTML;
-  this.maskElement.className = this.classPrefix + 'mask';
-  this.wrapperElement.appendChild(this.maskElement);
+  maskElement.innerHTML = wrapperElement.innerHTML;
+  maskElement.className = classPrefix + 'mask';
+  wrapperElement.appendChild(maskElement);
 
-  this.domElement.innerHTML = '';
-  this.domElement.appendChild(this.wrapperElement);
-};
-
-exports.Splitter.prototype.isSeparatorCharacter = function(c) {
-  c = c || '';
-  return c.match(/[\s-,.]/);
+  domElement.innerHTML = '';
+  domElement.appendChild(wrapperElement);
 };
 
 'use strict';
@@ -368,54 +442,40 @@ exports.StyleInjector.prototype.inject = function(css, doc) {
 exports.Shine = function(domElement, optClassPrefix, optShadowProperty) {
   var self = this;
 
-  optClassPrefix = optClassPrefix || 'shine-';
-  optShadowProperty = optShadowProperty || 'textShadow';
-
   if (!domElement) {
     throw new Error('No valid DOM element passed as first parameter');
   }
 
-  if (domElement.children && domElement.children.length > 0) {
-    throw new Error('Shine only works on elements with text content. ' +
-      'The DOM element cannot have any children.');
-  }
+  this.classPrefix = optClassPrefix || 'shine-';
+  this.shadowProperty = optShadowProperty ||
+    (this.elememtHasTextOnly(domElement) ? 'textShadow' : 'boxShadow');
 
   this.domElement = domElement;
   this.light = new exports.Light();
   this.shadows = [];
+  this.splitter = new exports.Splitter(domElement, this.classPrefix);
+
+  this.areAutoUpdatesEnabled = true;
 
   this.fnDrawHandler = function() {
     self.draw();
   };
 
-  this.init(optClassPrefix, optShadowProperty);
+  this.update();
 };
 
 /**
- * Adds DOM event listeners to automatically update all properties.
+ * Releases all resources and removes event listeners. Destroyed instances
+ * can't be reused and must be discarded.
  */
-exports.Shine.prototype.enableAutoUpdates = function() {
+exports.Shine.prototype.destroy = function() {
   this.disableAutoUpdates();
 
-  window.addEventListener('scroll', this.fnDrawHandler, false);
-  window.addEventListener('resize', this.fnDrawHandler, false);
+  this.light = null;
+  this.shadows = null;
+  this.splitter = null;
 
-  for (var i = this.shadows.length - 1; i >= 0; i--) {
-    var shadow = this.shadows[i];
-    shadow.enableAutoUpdates();
-  }
-};
-/**
- * Removes DOM event listeners to automatically update all properties.
- */
-exports.Shine.prototype.disableAutoUpdates = function() {
-  window.removeEventListener('scroll', this.fnDrawHandler, false);
-  window.removeEventListener('resize', this.fnDrawHandler, false);
-
-  for (var i = this.shadows.length - 1; i >= 0; i--) {
-    var shadow = this.shadows[i];
-    shadow.disableAutoUpdates();
-  }
+  this.fnDrawHandler = null;
 };
 
 /**
@@ -429,24 +489,76 @@ exports.Shine.prototype.draw = function() {
 };
 
 /**
- * Creates all required DOM elements and injects CSS. Called by constructor.
- * @private
- * @param {!string} classPrefix
- * @param {!string} shadowProperty
+ * Recreates all required DOM elements and injects CSS. Called by constructor.
+ *
+ * Use this method to re-initialize the DOM element (e.g. when the contents
+ * have changed) or to change the text.
+ *
+ * @param {?string=} optText Will set the text of the domElement. If optText is
+ *                           not defined, the current textContent of domElement
+ *                           will be used.
  */
-exports.Shine.prototype.init = function(classPrefix, shadowProperty) {
+exports.Shine.prototype.update = function(optText) {
+  var wereAutoUpdatesEnabled = this.areAutoUpdatesEnabled;
+  this.disableAutoUpdates();
+
   exports.StyleInjector.getInstance().inject(this.getCSS());
 
-  var splitter = new exports.Splitter(this.domElement, classPrefix);
+  this.shadows.length = 0;
 
-  for (var j = 0; j < splitter.letterElements.length; j++) {
-    var letterElement = splitter.letterElements[j];
-    var shadow = new exports.Shadow(letterElement);
+  this.splitter.split(optText, !this.elememtHasTextOnly(this.domElement));
+
+  var shadowProperty = this.getPrefixed(this.shadowProperty);
+
+  for (var j = 0; j < this.splitter.elements.length; j++) {
+    var element = this.splitter.elements[j];
+    var shadow = new exports.Shadow(element);
     shadow.shadowProperty = shadowProperty;
     this.shadows.push(shadow);
   }
 
-  this.enableAutoUpdates();
+  if (wereAutoUpdatesEnabled) {
+    this.enableAutoUpdates();
+  }
+  this.draw();
+};
+
+/**
+ * Adds DOM event listeners to automatically update all properties.
+ */
+exports.Shine.prototype.enableAutoUpdates = function() {
+  this.disableAutoUpdates();
+  this.areAutoUpdatesEnabled = true;
+
+  // store reference fore more efficient minification
+  var windowAddEventListener = window.addEventListener;
+  var fnDrawHandler = this.fnDrawHandler;
+
+  windowAddEventListener('scroll', fnDrawHandler, false);
+  windowAddEventListener('resize', fnDrawHandler, false);
+
+  for (var i = this.shadows.length - 1; i >= 0; i--) {
+    var shadow = this.shadows[i];
+    shadow.enableAutoUpdates();
+  }
+};
+/**
+ * Removes DOM event listeners to automatically update all properties.
+ */
+exports.Shine.prototype.disableAutoUpdates = function() {
+  this.areAutoUpdatesEnabled = false;
+
+  // store reference fore more efficient minification
+  var windowRemoveEventListener = window.removeEventListener;
+  var fnDrawHandler = this.fnDrawHandler;
+
+  windowRemoveEventListener('scroll', fnDrawHandler, false);
+  windowRemoveEventListener('resize', fnDrawHandler, false);
+
+  for (var i = this.shadows.length - 1; i >= 0; i--) {
+    var shadow = this.shadows[i];
+    shadow.disableAutoUpdates();
+  }
 };
 
 /**
@@ -478,6 +590,52 @@ exports.Shine.prototype.getCSS = function() {
     ' right: 0;' +
     ' bottom: 0;' +
     '}';
+};
+
+/**
+ * Prefixes a CSS property.
+ * @return {string}
+ */
+exports.Shine.prototype.getPrefixed = function(property) {
+  var element = this.domElement || document.createElement('div');
+  var style = element.style;
+
+  if (property in style) {
+    return property;
+  }
+
+  var prefixes = ['webkit', 'ms', 'Moz', 'Webkit', 'O'];
+  var suffix = property.charAt(0).toUpperCase() + property.substring(1);
+
+  for (var i = 0; i < prefixes.length; i++) {
+    var prefixed = prefixes[i] + suffix;
+    if (prefixed in style) {
+      return prefixed;
+    }
+  }
+
+  return property;
+};
+
+/**
+ * Checks whether a DOM element only contains childNodes of type TEXT_NODE (3).
+ * @param {HTMLElement} domElement
+ * @return {boolean}
+ */
+exports.Shine.prototype.elememtHasTextOnly = function(domElement) {
+  var childNodes = domElement.childNodes;
+
+  if (!childNodes || childNodes.length === 0) {
+    return true;
+  }
+
+  for (var i = 0; i < childNodes.length; i++) {
+    if (childNodes[i].nodeType !== 3) {
+      return false;
+    }
+  }
+
+  return true;
 };
 
 /**

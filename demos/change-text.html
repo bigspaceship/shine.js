@@ -1,0 +1,31 @@
+<html>
+  <head>
+    <title>Shine Demo</title>
+    <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,800,300" rel="stylesheet" type="text/css">
+    <link href="css/demo.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="../dist/shine.min.js"></script>
+  </head>
+  <body>
+    <button data-text="Shine Mouse-Follow Demo">Change Text</button>
+    <button data-text="Hello World">Change Text</button>
+    <button data-text="Lorem Ipsum">Change Text</button>
+
+    <h1 id="headline" class="demo-text">Shine Change-Text Demo</h1>
+
+    <script type="text/javascript">
+      // use new shinejs.Shine(...) if Shine is already defined somewhere else
+      // var shine = new shinejs.Shine(document.getElementById('headline'));
+      var shine = new Shine(document.getElementById('headline'));
+
+      function handleTextButtonClick(event) {
+        var text = event.target.dataset.text;
+        shine.update(text);
+      }
+
+      var textButtons = document.querySelectorAll('[data-text]');
+      for (var i = 0; i < textButtons.length; i++) {
+        textButtons[i].addEventListener('click', handleTextButtonClick, false);
+      }
+    </script>
+  </body>
+</html>

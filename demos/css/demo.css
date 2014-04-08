@@ -1,0 +1,23 @@
+/*
+  Custom styles
+ */
+.demo-text {
+  margin: auto;
+  position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
+  width: 100%;
+
+  display: table;
+  height: auto;
+
+  color: #fcfcfc;
+  text-transform: uppercase;
+  text-align: center;
+
+  font-size: 8em;
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 800;
+
+  letter-spacing: -0.02em;
+  line-height: 1.2em;
+}
