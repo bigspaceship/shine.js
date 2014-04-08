@@ -1,14 +1,53 @@
 (function(){
-  var shines = [];
-  var shineElements = document.querySelectorAll('.shine');
+  var shines = null;
+  var lightPosition = new shinejs.Point();
 
-  for (var i = 0; i < shineElements.length; i++) {
-    var element = shineElements[i];
-    var rect = element.getBoundingClientRect();
-    var shine = new Shine(element);
-    shine.light.position.x = rect.left + rect.width * 0.5;
-    shine.light.position.y = rect.top - rect.height;
-    shine.draw();
-    shines.push(shine);
+  function init() {
+    initShines();
+
+    window.addEventListener('resize', handleViewportUpdates, false);
+    window.addEventListener('scroll', handleViewportUpdates, false);
+
+    handleViewportUpdates();
   }
+
+  function initShines() {
+    destroyShines();
+
+    shines = [];
+
+    var shineElements = document.querySelectorAll('.shine');
+
+    for (var i = 0; i < shineElements.length; i++) {
+      var element = shineElements[i];
+      var shine = new Shine(element);
+      shine.light.position = lightPosition;
+      shine.draw();
+      shines.push(shine);
+    }
+  }
+
+  function destroyShines() {
+    if (!shines) {
+      return;
+    }
+
+    for (var i = 0; i < shines.length; i++) {
+      var shine = shines[i];
+      shine.destroy();
+    }
+
+    shines = null;
+  }
+
+  function handleViewportUpdates(event) {
+    lightPosition.x = window.innerWidth * 0.5;
+    lightPosition.y = window.innerHeight * 0.15;
+
+    for (var i = 0; i < shines.length; i++) {
+      shines[i].draw();
+    }
+  }
+
+  init();
 })();

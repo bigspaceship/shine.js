@@ -1,0 +1,156 @@
+* {
+  box-sizing: border-box;
+}
+
+body,
+html {
+  padding: 0;
+  margin: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 800;
+}
+
+pre {
+  max-width: 100%;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+
+  & > * {
+    -webkit-transform: translateZ(0px);
+  }
+}
+
+.highlight {
+  padding: 0.1em 0;
+  margin: 0;
+
+  .dark & {
+    padding-left: 1em;
+    padding-right: 1em;
+  }
+}
+.highlight {
+  margin: 0 0 ($base-line-height * .5);
+}
+
+.button {
+  display: inline-block;
+  padding: 1em;
+  margin: 0.25em 0;
+  line-height: 1em;
+  border-radius: 4px;
+
+  font-weight: 800;
+  color: white;
+  background: #333;
+
+  text-transform: uppercase;
+
+  .dark & {
+    background: white;
+    color: #333;
+  }
+}
+
+.container {
+  @include outer-container;
+  margin: 0 auto;
+  padding: 1em;
+
+  @include media($medium-screen-up) {
+    padding: 2em;
+  }
+}
+
+.one-half {
+  @include span-columns(6);
+}
+.one-third {
+  @include span-columns(4);
+}
+.two-thirds {
+  @include span-columns(8);
+}
+
+.big-banner {
+  padding: 2em 0.5em;
+  text-align: center;
+
+  @include media($medium-screen-up) {
+    padding: 4em 1em;
+  }
+  @include media($large-screen-up) {
+    padding: 4em 1em;
+  }
+
+  &.tall {
+    padding-top: 5em;
+    padding-bottom: 5em;
+
+    @include media($medium-screen-up) {
+      padding-top: 8em;
+      padding-bottom: 8em;
+    }
+    @include media($large-screen-up) {
+      padding-top: 10em;
+      padding-bottom: 10em;
+    }
+  }
+}
+
+.large {
+  font-size: 3.3em;
+  font-weight: 800;
+
+  letter-spacing: -0.02em;
+  line-height: 1.2em;
+  padding: 0 0.5em;
+
+  text-transform: uppercase;
+
+  @include media($medium-screen-up) {
+    font-size: 7em;
+  }
+  @include media($large-screen-up) {
+    font-size: 9em;
+  }
+}
+
+.medium {
+  font-size: 1.5em;
+  font-weight: 800;
+
+  letter-spacing: -0.02em;
+  line-height: 1.2em;
+
+  @include media($medium-screen-up) {
+    font-size: 2em;
+  }
+  @include media($large-screen-up) {
+    font-size: 2.5em;
+  }
+}
+
+.light {
+  background: #fff;
+  color: #3c3c3c;
+
+  &.shine,
+  .shine,
+  .highlight {
+    color: #fcfcfc;
+  }
+}
+
+.dark {
+  color: #fcfcfc;
+  background: #333;
+
+  &.shine,
+  .shine,
+  .highlight {
+    color: #3c3c3c;
+  }
+}
