@@ -3,7 +3,7 @@ layout: default
 title: shine.js
 ---
 
-<header class="big-banner tall">
+<header class="big-banner tall demo-header">
   <h1 class="shine large light">SHINE.JS</h1>
   <p class="shine light medium">A library for pretty shadows.</p>
 </header>
@@ -26,30 +26,35 @@ shine.draw();{% endhighlight %}
 
 <section class="container">
   <h3>Examples</h3>
+  <div class="tabs">
+    <a class="tab example-toggle" href="#autopilot-demo">Autopilot</a>
+    <a class="tab example-toggle" href="#mouse-follow-demo">Mouse-Follow</a>
+    <a class="tab example-toggle" href="#gyroscope-demo">Gyroscope</a>
+  </div>
+  <div class="demo big-banner light">
+    <h2 id="shine-example" class="shine large">Mouse-Follow Demo</h2>
+  </div>
   {% highlight javascript %}{% include scripts/mouse-follow.js %}{% endhighlight %}
+  <script>(function(){
+    {% include scripts/mouse-follow.js %}
+  }());</script>
 </section>
 
 <section class="dark">
   <div class="container">
-    <h3>Get shine.js</h3>
     <div class="one-half">
-      <a class="button" href="https://github.com/bigspaceship/shine.js/archive/master.zip">Download as ZIP</a>
+      <h3>Get shine.js</h3>
+      <ul>
+        <li><a class="button" href="https://github.com/bigspaceship/shine.js/archive/master.zip">Download as ZIP</a></li>
+        <li><a class="button" href="https://github.com/bigspaceship/shine.js">Fork on GitHub</a></li>
+      </ul>
     </div>
     <div class="one-half">
-      <a class="button" href="https://github.com/bigspaceship/shine.js">Fork on GitHub</a>
+        <h3>Features</h3>
+        <ul class="default-ul">
+          <li>Dynamic light positions</li>
+          <li>Works on any text node</li>
+        </ul>
+      </div>
     </div>
-  </div>
-  <div class="container">
-    <h3>Features</h3>
-    <ul class="default-ul">
-      <li>Dynamic light positions</li>
-      <li>Works on any text node</li>
-    </ul>
-  </div>
 </section>
-
-<!-- 
-<script>(function(){
-  {% include scripts/mouse-follow.js %}
-}());</script>
- -->

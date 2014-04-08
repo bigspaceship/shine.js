@@ -1,0 +1,19 @@
+@import 'button';
+
+.tabs {
+  @extend %button-outer;
+
+  display: inline-block;
+  padding: 0;
+}
+
+
+.tab {
+  @extend %button-inner;
+
+  border-left: 1px solid lighten($dark-gray, 20%);
+
+  &:first-child {
+    border-left: 0 none;
+  }
+}

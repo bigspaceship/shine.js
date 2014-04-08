@@ -14,6 +14,12 @@ ul, ol {
     margin-bottom: $base-line-height / 2;
     padding-left: $base-line-height;
   }
+
+  &.inline {
+    li {
+      display: inline-block;
+    }
+  }
 }
 
 dl {

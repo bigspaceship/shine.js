@@ -11,12 +11,16 @@
     handleViewportUpdates();
   }
 
+  function initExampleLinks() {
+
+  }
+
   function initShines() {
     destroyShines();
 
     shines = [];
 
-    var shineElements = document.querySelectorAll('.shine');
+    var shineElements = document.querySelectorAll('.demo-header .shine');
 
     for (var i = 0; i < shineElements.length; i++) {
       var element = shineElements[i];

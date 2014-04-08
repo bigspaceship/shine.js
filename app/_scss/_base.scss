@@ -35,45 +35,6 @@ pre {
   margin: 0 0 ($base-line-height * .5);
 }
 
-.button {
-  display: inline-block;
-  padding: 1em;
-  margin: 0.25em 0;
-  line-height: 1em;
-  border-radius: 4px;
-
-  font-weight: 800;
-  color: white;
-  background: #333;
-
-  text-transform: uppercase;
-
-  .dark & {
-    background: white;
-    color: #333;
-  }
-}
-
-.container {
-  @include outer-container;
-  margin: 0 auto;
-  padding: 1em;
-
-  @include media($medium-screen-up) {
-    padding: 2em;
-  }
-}
-
-.one-half {
-  @include span-columns(6);
-}
-.one-third {
-  @include span-columns(4);
-}
-.two-thirds {
-  @include span-columns(8);
-}
-
 .big-banner {
   padding: 2em 0.5em;
   text-align: center;
@@ -134,23 +95,23 @@ pre {
 }
 
 .light {
-  background: #fff;
-  color: #3c3c3c;
+  background: white;
+  color: $offdark-gray;
 
   &.shine,
   .shine,
   .highlight {
-    color: #fcfcfc;
+    color: $offwhite;
   }
 }
 
 .dark {
-  color: #fcfcfc;
-  background: #333;
+  color: $offwhite;
+  background: $dark-gray;
 
   &.shine,
   .shine,
   .highlight {
-    color: #3c3c3c;
+    color: $offdark-gray;
   }
 }

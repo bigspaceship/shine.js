@@ -1,4 +1,4 @@
-var shine = new Shine(document.getElementById('mouse-follow-headline'));
+var shine = new Shine(document.getElementById('shine-example'));
 
 function handleMouseMove(event) {
   shine.light.position.x = event.clientX;

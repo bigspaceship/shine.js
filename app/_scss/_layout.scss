@@ -1,0 +1,29 @@
+.container {
+  @include outer-container;
+  margin: 0 auto;
+  padding: 1em;
+
+  @include media($medium-screen-up) {
+    padding: 2em;
+  }
+}
+
+.row {
+  @include row;
+}
+
+.one-half {
+  @include media($medium-screen-up) {
+    @include span-columns(6, 12);
+  }
+}
+.one-third {
+  @include media($medium-screen-up) {
+    @include span-columns(4, 12);
+  }
+}
+.two-thirds {
+  @include media($medium-screen-up) {
+    @include span-columns(8, 12);
+  }
+}
