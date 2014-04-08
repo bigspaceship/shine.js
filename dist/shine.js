@@ -264,8 +264,10 @@ exports.Splitter = function(domElement, optClassPrefix) {
 /**
  * Performs the actual split
  * @param {?string=} optText Optional text to replace the content with
+ * @param {?boolean=} preserveChildren Preserves the nodes children as opposed
+ *                                     to converting its content to text-only.
  */
-exports.Splitter.prototype.split = function(optText) {
+exports.Splitter.prototype.split = function(optText, preserveChildren) {
 
   this.text = optText || this.text;
   this.wordElements.length = 0;
@@ -274,39 +276,15 @@ exports.Splitter.prototype.split = function(optText) {
   this.wrapperElement.className = this.classPrefix + 'wrapper';
   this.wrapperElement.innerHTML = '';
 
-  var hasTextOnly = this.hasTextOnly(this.domElement);
-
   if (optText) {
     this.domElement.textContent = this.text;
   }
 
-  if (hasTextOnly) {
-    this.splitText(this.domElement, this.maskElement, this.wrapperElement, this.classPrefix);
-  } else {
+  if (preserveChildren) {
     this.splitChildren(this.domElement, this.maskElement, this.wrapperElement, this.classPrefix);
+  } else {
+    this.splitText(this.domElement, this.maskElement, this.wrapperElement, this.classPrefix);
   }
-};
-
-/**
- * Checks whether a DOM element only contains childNodes of type TEXT_NODE (3).
- * @param {HTMLElement} domElement
- * @return {Boolean}
- */
-exports.Splitter.prototype.hasTextOnly = function(domElement) {
-  var childNodes = domElement.childNodes;
-  console.log(childNodes);
-
-  if (!childNodes || childNodes.length === 0) {
-    return true;
-  }
-
-  for (var i = 0; i < childNodes.length; i++) {
-    if (childNodes[i].nodeType !== 3) {
-      return false;
-    }
-  }
-
-  return true;
 };
 
 /**
@@ -469,7 +447,9 @@ exports.Shine = function(domElement, optClassPrefix, optShadowProperty) {
   }
 
   this.classPrefix = optClassPrefix || 'shine-';
-  this.shadowProperty = optShadowProperty || 'textShadow';
+  this.shadowProperty = optShadowProperty ||
+    (this.elememtHasTextOnly(domElement) ? 'textShadow' : 'boxShadow');
+
   this.domElement = domElement;
   this.light = new exports.Light();
   this.shadows = [];
@@ -526,12 +506,14 @@ exports.Shine.prototype.update = function(optText) {
 
   this.shadows.length = 0;
 
-  this.splitter.split(optText);
+  this.splitter.split(optText, !this.elememtHasTextOnly(this.domElement));
+
+  var shadowProperty = this.getPrefixed(this.shadowProperty);
 
   for (var j = 0; j < this.splitter.elements.length; j++) {
     var element = this.splitter.elements[j];
     var shadow = new exports.Shadow(element);
-    shadow.shadowProperty = this.shadowProperty;
+    shadow.shadowProperty = shadowProperty;
     this.shadows.push(shadow);
   }
 
@@ -608,6 +590,52 @@ exports.Shine.prototype.getCSS = function() {
     ' right: 0;' +
     ' bottom: 0;' +
     '}';
+};
+
+/**
+ * Prefixes a CSS property.
+ * @return {string}
+ */
+exports.Shine.prototype.getPrefixed = function(property) {
+  var element = this.domElement || document.createElement('div');
+  var style = element.style;
+
+  if (property in style) {
+    return property;
+  }
+
+  var prefixes = ['webkit', 'ms', 'Moz', 'Webkit', 'O'];
+  var suffix = property.charAt(0).toUpperCase() + property.substring(1);
+
+  for (var i = 0; i < prefixes.length; i++) {
+    var prefixed = prefixes[i] + suffix;
+    if (prefixed in style) {
+      return prefixed;
+    }
+  }
+
+  return property;
+};
+
+/**
+ * Checks whether a DOM element only contains childNodes of type TEXT_NODE (3).
+ * @param {HTMLElement} domElement
+ * @return {boolean}
+ */
+exports.Shine.prototype.elememtHasTextOnly = function(domElement) {
+  var childNodes = domElement.childNodes;
+
+  if (!childNodes || childNodes.length === 0) {
+    return true;
+  }
+
+  for (var i = 0; i < childNodes.length; i++) {
+    if (childNodes[i].nodeType !== 3) {
+      return false;
+    }
+  }
+
+  return true;
 };
 
 /**
