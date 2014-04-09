@@ -1,0 +1,8 @@
+/*
+  dat.gui fix for border-box
+ */
+.dg.ac {
+  &, * {
+    box-sizing: content-box;
+  }
+}

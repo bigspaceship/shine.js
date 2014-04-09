@@ -1,6 +1,32 @@
-/*! shine.js - v0.1.0 - 2014-04-08
+/*! shine.js - v0.1.0 - 2014-04-09
 * http://bigspaceship.github.io/shine.js
 * Copyright (c) 2014 Big Spaceship; Licensed MIT */
+/* jshint ignore:start */
+if (!Function.prototype.bind) {
+  Function.prototype.bind = function (oThis) {
+    if (typeof this !== "function") {
+      // closest thing possible to the ECMAScript 5 internal IsCallable function
+      throw new TypeError("Function.prototype.bind - what is trying to be bound is not callable");
+    }
+
+    var aArgs = Array.prototype.slice.call(arguments, 1),
+        fToBind = this,
+        fNOP = function () {},
+        fBound = function () {
+          return fToBind.apply(this instanceof fNOP && oThis
+                                 ? this
+                                 : oThis,
+                               aArgs.concat(Array.prototype.slice.call(arguments)));
+        };
+
+    fNOP.prototype = this.prototype;
+    fBound.prototype = new fNOP();
+
+    return fBound;
+  };
+}
+/* jshint ignore:end */
+
 'use strict';
 
 /**
@@ -67,41 +93,85 @@ exports.Point.prototype.delta = function(p) {
 'use strict';
 
 /**
+ * Creates a new ShadowConfig instance that can be shared across multiple
+ * Shadow instance.
+ *
  * @constructor
- * @param {!HTMLElement} domElement
+ * @param {?Object=} optSettings An optional settings file with existing values.
+ *
+ * Valid settings are:
+ *  * stepSize
+ *  * maxSteps
+ *  * opacity
+ *  * opacityPow
+ *  * offset
+ *  * offsetPow
+ *  * blur
+ *  * blurPow
+ *  * maxBlurRadius
+ *  * shadowRGB
  */
-exports.Shadow = function(domElement) {
+exports.ShadowConfig = function(optSettings) {
   /** @type {number} */
   this.stepSize = 8;
   /** @type {number} */
   this.maxSteps = 5;
 
   /** @type {number} */
-  this.opacityMultiplier = 0.15;
+  this.opacity = 0.15;
   /** @type {number} */
   this.opacityPow = 1.2;
 
   /** @type {number} */
-  this.offsetMultiplier = 0.15;
+  this.offset = 0.15;
   /** @type {number} */
   this.offsetPow = 1.8;
 
   /** @type {number} */
-  this.blurMultiplier = 0.1;
+  this.blur = 0.1;
   /** @type {number} */
   this.blurPow = 1.4;
   /** @type {number} */
   this.maxBlurRadius = 64;
+  /** @type {!exports.Color} */
+  this.shadowRGB = new exports.Color(0, 0, 0);
 
+  this.applyValues(optSettings);
+};
+
+/**
+ * Extends this instance with all valid values from <code>settings</code>.
+ * @param {?Object=} settings An object containing the properties to override.
+ */
+exports.ShadowConfig.prototype.applyValues = function(settings) {
+  if (!settings) {
+    return;
+  }
+
+  for (var key in this) {
+    if (key in settings) {
+      this[key] = settings[key];
+    }
+  }
+};
+
+'use strict';
+
+/**
+ * @constructor
+ * @param {!HTMLElement} domElement
+ * @param {!ShadowConfig} config
+ */
+exports.Shadow = function(domElement, config) {
   /** @type {!exports.Point} */
   this.position = new exports.Point(0, 0);
   /** @type {!HTMLElement} */
   this.domElement = domElement;
+  /** @type {!ShadowConfig} */
+  this.config = config;
 
   /** @type {!string} */
   this.shadowProperty = 'textShadow';
-  /** @type {!exports.Color} */
-  this.shadowRGB = new exports.Color(0, 0, 0);
 
   /**
    * @const
@@ -119,29 +189,30 @@ exports.Shadow = function(domElement) {
  */
 exports.Shadow.prototype.draw = function(light) {
 
+  var config = this.config;
   var delta = this.position.delta(light.position);
   var distance = Math.sqrt(delta.x * delta.x + delta.y * delta.y);
   distance = Math.max(40, distance);  // keep a min amount of shadow
 
-  var numSteps = distance / this.stepSize;
-  numSteps = Math.min(this.maxSteps, Math.round(numSteps));
+  var numSteps = distance / config.stepSize;
+  numSteps = Math.min(config.maxSteps, Math.round(numSteps));
 
   var shadows = [];
 
   for (var i = 0; i < numSteps; i++) {
     var ratio = i / numSteps;
 
-    var ratioOpacity = Math.pow(ratio, this.opacityPow);
-    var ratioOffset = Math.pow(ratio, this.offsetPow);
-    var ratioBlur = Math.pow(ratio, this.blurPow);
+    var ratioOpacity = Math.pow(ratio, config.opacityPow);
+    var ratioOffset = Math.pow(ratio, config.offsetPow);
+    var ratioBlur = Math.pow(ratio, config.blurPow);
 
-    var opacity = light.intensity * Math.max(0, this.opacityMultiplier * (1.0 - ratioOpacity));
-    var offsetX = - this.offsetMultiplier * delta.x * ratioOffset;
-    var offsetY = - this.offsetMultiplier * delta.y * ratioOffset;
-    var blurRadius = this.blurMultiplier * distance * ratioBlur;
-    blurRadius = Math.min(this.maxBlurRadius, blurRadius);
+    var opacity = light.intensity * Math.max(0, config.opacity * (1.0 - ratioOpacity));
+    var offsetX = - config.offset * delta.x * ratioOffset;
+    var offsetY = - config.offset * delta.y * ratioOffset;
+    var blurRadius = config.blur * distance * ratioBlur;
+    blurRadius = Math.min(config.maxBlurRadius, blurRadius);
 
-    var shadow = this.getShadow(this.shadowRGB, opacity, offsetX, offsetY, blurRadius);
+    var shadow = this.getShadow(config.shadowRGB, opacity, offsetX, offsetY, blurRadius);
     shadows.push(shadow);
   }
 
@@ -177,10 +248,8 @@ exports.Shadow.prototype.enableAutoUpdates = function() {
   this.disableAutoUpdates();
 
   // store reference fore more efficient minification
-  var self = this;
-  var fnHandleViewportUpdate = this.fnHandleViewportUpdate = function(){
-    self.handleViewportUpdate();
-  };
+  var fnHandleViewportUpdate = this.fnHandleViewportUpdate =
+    this.handleViewportUpdate.bind(this);
 
   document.addEventListener('resize', fnHandleViewportUpdate, false);
   document.addEventListener('load', fnHandleViewportUpdate, false);
@@ -436,12 +505,13 @@ exports.StyleInjector.prototype.inject = function(css, doc) {
  * @param {!HTMLElement} domElement The element to apply the shine effect to.
  *                                  This element may contain text content only
  *                                  and have no children.
+ * @param {!ShadowConfig} optConfig An optional ShadowConfig instance.
  * @param {?string=} optClassPrefix An optional class-prefix applied to all
  *                                  injected styles. Defaults to 'shine-'.
  * @param {?string=} optShadowProperty Can be 'textShadow' or 'boxShadow'.
  *                                     Defaults to 'textShadow'.
  */
-exports.Shine = function(domElement, optClassPrefix, optShadowProperty) {
+exports.Shine = function(domElement, optConfig, optClassPrefix, optShadowProperty) {
   if (!domElement) {
     throw new Error('No valid DOM element passed as first parameter');
   }
@@ -452,6 +522,7 @@ exports.Shine = function(domElement, optClassPrefix, optShadowProperty) {
 
   this.domElement = domElement;
   this.light = new exports.Light();
+  this.config = optConfig || new exports.ShadowConfig();
   this.shadows = [];
   this.splitter = new exports.Splitter(domElement, this.classPrefix);
 
@@ -459,7 +530,7 @@ exports.Shine = function(domElement, optClassPrefix, optShadowProperty) {
 
   this.fnDrawHandler = null;
 
-  this.update();
+  this.updateContent();
 };
 
 /**
@@ -480,9 +551,8 @@ exports.Shine.prototype.destroy = function() {
  * Draws all shadows based on the current light position.
  */
 exports.Shine.prototype.draw = function() {
-  for (var i = 0; i < this.shadows.length; i++) {
-    var shadow = this.shadows[i];
-    shadow.draw(this.light);
+  for (var i = this.shadows.length - 1; i >= 0; i--) {
+    this.shadows[i].draw(this.light);
   }
 };
 
@@ -496,7 +566,7 @@ exports.Shine.prototype.draw = function() {
  *                           not defined, the current textContent of domElement
  *                           will be used.
  */
-exports.Shine.prototype.update = function(optText) {
+exports.Shine.prototype.updateContent = function(optText) {
   var wereAutoUpdatesEnabled = this.areAutoUpdatesEnabled;
   this.disableAutoUpdates();
 
@@ -510,7 +580,7 @@ exports.Shine.prototype.update = function(optText) {
 
   for (var j = 0; j < this.splitter.elements.length; j++) {
     var element = this.splitter.elements[j];
-    var shadow = new exports.Shadow(element);
+    var shadow = new exports.Shadow(element, this.config);
     shadow.shadowProperty = shadowProperty;
     this.shadows.push(shadow);
   }
@@ -529,10 +599,7 @@ exports.Shine.prototype.enableAutoUpdates = function() {
   this.areAutoUpdatesEnabled = true;
 
   // store reference fore more efficient minification
-  var self = this;
-  var fnDrawHandler = this.fnDrawHandler = function(){
-    self.draw();
-  };
+  var fnDrawHandler = this.fnDrawHandler = this.draw.bind(this);
 
   window.addEventListener('scroll', fnDrawHandler, false);
   window.addEventListener('resize', fnDrawHandler, false);
