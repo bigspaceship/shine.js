@@ -9,11 +9,7 @@ module.exports = function(grunt) {
   grunt.initConfig({
     // Metadata.
     pkg: grunt.file.readJSON('bower.json'),
-    banner: '/*! <%= pkg.title %> - v<%= pkg.version %> - ' +
-      '<%= grunt.template.today("yyyy-mm-dd") %>\n' +
-      '<%= pkg.homepage ? "* " + pkg.homepage + "\\n" : "" %>' +
-      '* Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.copyright %>;' +
-      ' Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %> */\n',
+    banner: '/*! <%= pkg.title %> - v<%= pkg.version %> - ' + '<%= grunt.template.today("yyyy-mm-dd") %>\n' + '<%= pkg.homepage ? "* " + pkg.homepage + "\\n" : "" %>' + '* Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.copyright %>;' + ' Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %> */\n',
     // Task configuration.
     concat: {
       options: {
@@ -21,7 +17,11 @@ module.exports = function(grunt) {
         stripBanners: true
       },
       dist: {
-        src: ['lib/<%= pkg.name %>.*.js', 'lib/shine.js'],
+        src: [
+            'lib/function.bind.polyfill.js',
+            'lib/<%= pkg.name %>.*.js',
+            'lib/shine.js'
+          ],
         dest: 'dist/<%= pkg.name %>.js'
       }
     },
@@ -41,7 +41,7 @@ module.exports = function(grunt) {
         node: true,
         browser: true,
         esnext: true,
-        bitwise: true,
+        bitwise: false,
         camelcase: true,
         curly: true,
         eqeqeq: true,
@@ -67,6 +67,15 @@ module.exports = function(grunt) {
     qunit: {
       files: ['test/**/*.html']
     },
+    copy: {
+      ghpages: {
+        expand: true,
+        flatten: true,
+        filter: 'isFile',
+        src: ['dist/**'],
+        dest: '../gh-pages/app/js/'
+      }
+    },
     watch: {
       gruntfile: {
         files: '<%= jshint.gruntfile.src %>',
@@ -74,8 +83,9 @@ module.exports = function(grunt) {
       },
       js: {
         files: ['<%= concat.dist.src %>'],
-        tasks: ['jshint', 'concat', 'uglify']
-      }/*,
+        tasks: ['jshint', 'concat', 'uglify', 'ghpages']
+      }
+      /*,
       lib_test: {
         files: '<%= jshint.lib_test.src %>',
         tasks: ['jshint:lib_test', 'qunit']
@@ -83,8 +93,25 @@ module.exports = function(grunt) {
     }
   });
 
+  grunt.registerTask('ghpages','Copy files to GitHub Pages directory', function(){
+    var dest = grunt.config.get('copy.ghpages.dest');
+
+    if (!grunt.file.exists(dest)) {
+      grunt.log.writeln('To copy dist files to gh-pages on build, checkout ' +
+        'the \n\'gh-pages\' branch so that ' + dest + 'is writable.');
+      return true;
+    }
+
+    grunt.log.writeln('Copying distribution files to ', dest);
+
+    grunt.task.run('copy:ghpages');
+
+    return true;
+  });
+
   // These plugins provide necessary tasks.
   grunt.loadNpmTasks('grunt-contrib-concat');
+  grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-qunit');
   grunt.loadNpmTasks('grunt-contrib-jshint');

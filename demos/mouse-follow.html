@@ -1,0 +1,26 @@
+<html>
+  <head>
+    <title>Shine Demo</title>
+    <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,800,300" rel="stylesheet" type="text/css">
+    <link href="css/demo.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="../dist/shine.min.js"></script>
+  </head>
+  <body>
+
+    <h1 id="headline" class="demo-text">Shine Mouse-Follow Demo</h1>
+
+    <script type="text/javascript">
+      // use new shinejs.Shine(...) if Shine is already defined somewhere else
+      // var shine = new shinejs.Shine(document.getElementById('headline'));
+      var shine = new Shine(document.getElementById('headline'));
+
+      function handleMouseMove(event) {
+        shine.light.position.x = event.clientX;
+        shine.light.position.y = event.clientY;
+        shine.draw();
+      }
+
+      window.addEventListener('mousemove', handleMouseMove, false);
+    </script>
+  </body>
+</html>
