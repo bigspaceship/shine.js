@@ -1,4 +1,4 @@
-/*! shine.js - v0.1.0 - 2014-04-09
+/*! shine.js - v0.2.1 - 2014-04-09
 * http://bigspaceship.github.io/shine.js
 * Copyright (c) 2014 Big Spaceship; Licensed MIT */
 /* jshint ignore:start */
@@ -600,7 +600,7 @@ exports.Shine.prototype.updateContent = function(optText) {
 
   this.shadows.length = 0;
 
-  this.splitter.split(optText, !this.elememtHasTextOnly(this.domElement));
+  this.splitter.split(optText, !optText && !this.elememtHasTextOnly(this.domElement));
 
   var shadowProperty = this.getPrefixed(this.shadowProperty);
 
