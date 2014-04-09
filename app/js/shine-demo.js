@@ -50,8 +50,7 @@ ShineDemo.prototype.initGui = function() {
   var shadowFolder = this.gui.addFolder('Shadow');
   var colorFolder = this.gui.addFolder('Color');
 
-  shadowFolder.add(this.config, 'stepSize').min(1).max(256).step(1).onChange(fnDraw);
-  shadowFolder.add(this.config, 'maxSteps').min(1).max(64).step(1).onChange(fnDraw);
+  shadowFolder.add(this.config, 'numSteps').min(1).max(64).step(1).onChange(fnDraw);
   shadowFolder.add(this.config, 'opacity').min(0).max(1).step(0.025).onChange(fnDraw);
   shadowFolder.add(this.config, 'opacityPow').min(0).max(8).step(0.05).onChange(fnDraw);
   shadowFolder.add(this.config, 'offset').min(0).max(1).step(0.01).onChange(fnDraw);

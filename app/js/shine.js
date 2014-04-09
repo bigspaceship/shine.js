@@ -100,8 +100,7 @@ exports.Point.prototype.delta = function(p) {
  * @param {?Object=} optSettings An optional settings file with existing values.
  *
  * Valid settings are:
- *  * stepSize
- *  * maxSteps
+ *  * numSteps
  *  * opacity
  *  * opacityPow
  *  * offset
@@ -113,9 +112,7 @@ exports.Point.prototype.delta = function(p) {
  */
 exports.ShadowConfig = function(optSettings) {
   /** @type {number} */
-  this.stepSize = 8;
-  /** @type {number} */
-  this.maxSteps = 5;
+  this.numSteps = 5;
 
   /** @type {number} */
   this.opacity = 0.15;
@@ -192,15 +189,12 @@ exports.Shadow.prototype.draw = function(light) {
   var config = this.config;
   var delta = this.position.delta(light.position);
   var distance = Math.sqrt(delta.x * delta.x + delta.y * delta.y);
-  distance = Math.max(40, distance);  // keep a min amount of shadow
-
-  var numSteps = distance / config.stepSize;
-  numSteps = Math.min(config.maxSteps, Math.round(numSteps));
+  distance = Math.max(32, distance);  // keep a min amount of shadow
 
   var shadows = [];
 
-  for (var i = 0; i < numSteps; i++) {
-    var ratio = i / numSteps;
+  for (var i = 0; i < config.numSteps; i++) {
+    var ratio = i / config.numSteps;
 
     var ratioOpacity = Math.pow(ratio, config.opacityPow);
     var ratioOffset = Math.pow(ratio, config.offsetPow);
@@ -252,7 +246,7 @@ exports.Shadow.prototype.enableAutoUpdates = function() {
     this.handleViewportUpdate.bind(this);
 
   document.addEventListener('resize', fnHandleViewportUpdate, false);
-  document.addEventListener('load', fnHandleViewportUpdate, false);
+  window.addEventListener('load', fnHandleViewportUpdate, false);
   window.addEventListener('resize', fnHandleViewportUpdate, false);
   window.addEventListener('scroll', fnHandleViewportUpdate, false);
 };
@@ -273,7 +267,7 @@ exports.Shadow.prototype.disableAutoUpdates = function() {
   this.fnHandleViewportUpdate = null;
 
   document.removeEventListener('resize', fnHandleViewportUpdate, false);
-  document.removeEventListener('load', fnHandleViewportUpdate, false);
+  window.removeEventListener('load', fnHandleViewportUpdate, false);
   window.removeEventListener('resize', fnHandleViewportUpdate, false);
   window.removeEventListener('scroll', fnHandleViewportUpdate, false);
 };
