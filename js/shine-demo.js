@@ -3,18 +3,7 @@
 'use strict';
 
 function ShineDemo() {
-  this.config = new shinejs.ShadowConfig({
-    stepSize: 8,
-    maxSteps: 5,
-    opacity: 0.15,
-    opacityPow: 1.2,
-    offset: 0.15,
-    offsetPow: 1.8,
-    blur: 0.1,
-    blurPow: 1.4,
-    maxBlurRadius: 64,
-    shadowRGB: new shinejs.Color(0, 0, 0)
-  });
+  this.config = new shinejs.Config();
   this.colors = {
     text: '#f7f7f7',
     shadow: '#000',
@@ -59,15 +48,15 @@ ShineDemo.prototype.initGui = function() {
   shadowFolder.add(this.config, 'opacityPow').min(0).max(8).step(0.05).onChange(fnDraw);
   shadowFolder.add(this.config, 'offset').min(0).max(1).step(0.01).onChange(fnDraw);
   shadowFolder.add(this.config, 'offsetPow').min(0).max(4).step(0.05).onChange(fnDraw);
-  shadowFolder.add(this.config, 'blur').min(0).max(1).step(0.025).onChange(fnDraw);
+  shadowFolder.add(this.config, 'blur').min(0).max(128).step(1).onChange(fnDraw);
   shadowFolder.add(this.config, 'blurPow').min(0).max(4).step(0.05).onChange(fnDraw);
-  shadowFolder.add(this.config, 'maxBlurRadius').min(0).max(128).step(4).onChange(fnDraw);
 
   colorFolder.addColor(this.colors, 'text').onChange(fnUpdateColor);
   colorFolder.addColor(this.colors, 'shadow').onChange(fnUpdateColor);
   colorFolder.addColor(this.colors, 'background').onChange(fnUpdateColor);
 
   shadowFolder.open();
+  colorFolder.open();
   this.gui.close();
 };
 
@@ -139,13 +128,24 @@ ShineDemo.prototype.handleOrientationChange = function(event) {
 };
 
 ShineDemo.prototype.handleColorUpdates = function(event) {
-  this.config.shadowRGB = this.rgbFromHex(this.colors.shadow);
+  this.config.shadowRGB = shinejs.Color.colorFromHex(this.colors.shadow);
   document.body.style.backgroundColor = this.colors.background;
   document.documentElement.style.backgroundColor = this.colors.background;
 
-  for (var i = this.shines.length - 1; i >= 0; i--) {
-    var shine = this.shines[i];
-    shine.domElement.style.color = this.colors.text;
+  var textColorElements = document.querySelectorAll('.shine-text-color');
+  for (var i = textColorElements.length - 1; i >= 0; i--) {
+    var element = textColorElements[i];
+    var color = this.colors.text;
+
+    if (element.className.indexOf('shine-text-color-dark') !== -1) {
+      var rgb = shinejs.Color.colorFromHex(color);
+      rgb.r *= 0.9;
+      rgb.g *= 0.9;
+      rgb.b *= 0.9;
+      color = rgb.getRGBAString();
+    }
+
+    element.style.color = color;
   }
 
   this.draw();
@@ -159,5 +159,12 @@ ShineDemo.prototype.rgbFromHex = function(hex) {
     (color >> 8) & 0xff,
     color & 0xff
   );
+};
+ShineDemo.prototype.rgbaFromRgb = function(rgb) {
+  return 'rgba(' +
+    Math.round(rgb.r) + ',' +
+    Math.round(rgb.g) + ',' +
+    Math.round(rgb.b) + ',' +
+  ' 1.0)';
 };
 
