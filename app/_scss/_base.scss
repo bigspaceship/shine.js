@@ -8,10 +8,6 @@ html {
   margin: 0;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-weight: 800;
-}
-
 pre {
   max-width: 100%;
   overflow: auto;
@@ -23,16 +19,17 @@ pre {
 }
 
 .highlight {
-  padding: 0.1em 0;
-  margin: 0;
+  padding: 0.5em 0;
+  margin: 0 0 ($base-line-height * .5);
 
   .dark & {
     padding-left: 1em;
     padding-right: 1em;
   }
-}
-.highlight {
-  margin: 0 0 ($base-line-height * .5);
+
+  pre {
+    margin: 0;
+  }
 }
 
 .big-banner {
@@ -63,7 +60,8 @@ pre {
 
 .large {
   font-size: 3.3em;
-  font-weight: 800;
+  font-weight: $heavy-font-weight;
+  font-family: $sans-serif-condensed;
 
   letter-spacing: -0.02em;
   line-height: 1.2em;
@@ -81,9 +79,10 @@ pre {
 
 .medium {
   font-size: 1.5em;
-  font-weight: 800;
+  font-family: $sans-serif-condensed;
+  font-weight: $heavy-font-weight;
 
-  letter-spacing: -0.02em;
+  letter-spacing: -0.05em;
   line-height: 1.2em;
 
   @include media($medium-screen-up) {

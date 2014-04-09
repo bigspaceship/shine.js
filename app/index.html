@@ -17,12 +17,12 @@ title: shine.js
       <p>Instantiate shine.js:</p>
 {% highlight javascript %}var shine = new Shine(document.getElementById('my-shine-object'));{% endhighlight %}
       <p>Change the light position:</p>
-{% highlight javascript %}shine.light.position.x = window.innerWidth * 0.5;
-shine.light.position.y = window.innerHeight * 0.5;
-shine.draw();{% endhighlight %}
+{% highlight javascript %}window.addEventListener('mousemove', function(event) {
+  shine.light.position.x = event.clientX;
+  shine.light.position.y = event.clientY;
+  shine.draw();
+}, false);{% endhighlight %}
     </div>
-    <h3>Mouse-Follow Example</h3>
-    {% highlight javascript %}{% include scripts/mouse-follow.js %}{% endhighlight %}
     <div class="one-half">
       <h3>Get shine.js</h3>
       <ul>

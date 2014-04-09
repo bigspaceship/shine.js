@@ -3,7 +3,8 @@
   margin: 0.25em 0;
   border-radius: 4px;
 
-  font-weight: 800;
+  font-weight: $heavy-font-weight;
+  font-family: $sans-serif-condensed;
   background: $dark-gray;
 }
 

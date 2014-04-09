@@ -2,12 +2,14 @@ body {
   color: $base-font-color;
   font-family: $base-font-family;
   font-size: $base-font-size;
+  font-weight: $base-font-weight;
   -webkit-font-smoothing: antialiased;
   line-height: $base-line-height;
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: $header-font-family;
+  font-weight: $heavy-font-weight;
   line-height: 1.25em;
   margin: 0;
   text-rendering: optimizeLegibility; // Fix the character spacing for headings

@@ -1,17 +1,21 @@
 // Typography
 ///////////////////////////////////////////////////////////////////////////////
 $serif: $georgia;
-$sans-serif: 'Open Sans', sans-serif;
+// $sans-serif: 'Open Sans', sans-serif;
+$sans-serif: 'Roboto', sans-serif;
+$sans-serif-condensed: 'Roboto Condensed', sans-serif;
 $monospace: 'Inconsolata', Courier, monospace;;
 
 $base-font-family: $sans-serif;
-$header-font-family: $base-font-family;
+$header-font-family: $sans-serif-condensed;
 
 // Sizes
 ///////////////////////////////////////////////////////////////////////////////
 $base-font-size: 1em;
 $base-line-height: $base-font-size * 1.5;
 $base-border-radius: em(3);
+$base-font-weight: 400;
+$heavy-font-weight: 700;
 
 // Colors
 ///////////////////////////////////////////////////////////////////////////////
