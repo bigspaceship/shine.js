@@ -1,4 +1,4 @@
-/*! shine.js - v0.1.0 - 2014-04-08
+/*! shine.js - v0.1.0 - 2014-04-09
 * http://bigspaceship.github.io/shine.js
 * Copyright (c) 2014 Big Spaceship; Licensed MIT */
 'use strict';
@@ -459,7 +459,7 @@ exports.Shine = function(domElement, optClassPrefix, optShadowProperty) {
 
   this.fnDrawHandler = null;
 
-  this.update();
+  this.updateContent();
 };
 
 /**
@@ -496,7 +496,7 @@ exports.Shine.prototype.draw = function() {
  *                           not defined, the current textContent of domElement
  *                           will be used.
  */
-exports.Shine.prototype.update = function(optText) {
+exports.Shine.prototype.updateContent = function(optText) {
   var wereAutoUpdatesEnabled = this.areAutoUpdatesEnabled;
   this.disableAutoUpdates();
 
