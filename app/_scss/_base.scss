@@ -59,37 +59,38 @@ pre {
 }
 
 .large {
-  font-size: 3.3em;
+  font-size: 4.5em;
   font-weight: $heavy-font-weight;
   font-family: $sans-serif-condensed;
 
   letter-spacing: -0.02em;
-  line-height: 1.2em;
-  padding: 0 0.5em;
+  line-height: 1.0em;
+  padding: 0 0.025em;
 
   text-transform: uppercase;
 
   @include media($medium-screen-up) {
-    font-size: 7em;
+    font-size: 10em;
   }
   @include media($large-screen-up) {
-    font-size: 9em;
+    font-size: 13em;
   }
 }
 
 .medium {
-  font-size: 1.5em;
+  font-size: 2em;
   font-family: $sans-serif-condensed;
   font-weight: $heavy-font-weight;
 
   letter-spacing: -0.05em;
-  line-height: 1.2em;
+  line-height: 1.0em;
+  padding: 0 0.025em;
 
   @include media($medium-screen-up) {
-    font-size: 2em;
+    font-size: 3em;
   }
   @include media($large-screen-up) {
-    font-size: 2.5em;
+    font-size: 3.75em;
   }
 }
 
