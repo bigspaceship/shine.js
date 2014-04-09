@@ -69,7 +69,7 @@ module.exports = function(grunt) {
         flatten: true,
         filter: 'isFile',
         src: ['dist/**'],
-        dest: '../gh-pages/dist/js/'
+        dest: '../gh-pages/app/js/'
       }
     },
     watch: {
