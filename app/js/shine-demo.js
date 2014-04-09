@@ -68,6 +68,7 @@ ShineDemo.prototype.initGui = function() {
   colorFolder.addColor(this.colors, 'background').onChange(fnUpdateColor);
 
   shadowFolder.open();
+  colorFolder.open();
   this.gui.close();
 };
 
@@ -139,13 +140,24 @@ ShineDemo.prototype.handleOrientationChange = function(event) {
 };
 
 ShineDemo.prototype.handleColorUpdates = function(event) {
-  this.config.shadowRGB = this.rgbFromHex(this.colors.shadow);
+  this.config.shadowRGB = shinejs.Color.colorFromHex(this.colors.shadow);
   document.body.style.backgroundColor = this.colors.background;
   document.documentElement.style.backgroundColor = this.colors.background;
 
-  for (var i = this.shines.length - 1; i >= 0; i--) {
-    var shine = this.shines[i];
-    shine.domElement.style.color = this.colors.text;
+  var textColorElements = document.querySelectorAll('.shine-text-color');
+  for (var i = textColorElements.length - 1; i >= 0; i--) {
+    var element = textColorElements[i];
+    var color = this.colors.text;
+
+    if (element.className.indexOf('shine-text-color-dark') !== -1) {
+      var rgb = shinejs.Color.colorFromHex(color);
+      rgb.r *= 0.9;
+      rgb.g *= 0.9;
+      rgb.b *= 0.9;
+      color = rgb.getRGBAString();
+    }
+
+    element.style.color = color;
   }
 
   this.draw();
@@ -159,5 +171,12 @@ ShineDemo.prototype.rgbFromHex = function(hex) {
     (color >> 8) & 0xff,
     color & 0xff
   );
+};
+ShineDemo.prototype.rgbaFromRgb = function(rgb) {
+  return 'rgba(' +
+    Math.round(rgb.r) + ',' +
+    Math.round(rgb.g) + ',' +
+    Math.round(rgb.b) + ',' +
+  ' 1.0)';
 };
 

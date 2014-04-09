@@ -63,11 +63,12 @@ pre {
   font-weight: $heavy-font-weight;
   font-family: $sans-serif-condensed;
 
-  letter-spacing: -0.02em;
+  letter-spacing: -0.04em;
   line-height: 1.0em;
   padding: 0 0.025em;
+  margin-bottom: 0.1em;
 
-  text-transform: uppercase;
+  // text-transform: uppercase;
 
   @include media($medium-screen-up) {
     font-size: 10em;
@@ -78,19 +79,20 @@ pre {
 }
 
 .medium {
-  font-size: 2em;
+  font-size: 1em;
   font-family: $sans-serif-condensed;
   font-weight: $heavy-font-weight;
+  color: $light-gray;
 
-  letter-spacing: -0.05em;
-  line-height: 1.0em;
+  letter-spacing: -0.04em;
+  line-height: 2.0em;
   padding: 0 0.025em;
 
   @include media($medium-screen-up) {
-    font-size: 3em;
+    font-size: 2em;
   }
   @include media($large-screen-up) {
-    font-size: 3.75em;
+    font-size: 3em;
   }
 }
 
@@ -105,7 +107,7 @@ pre {
 }
 
 .dark {
-  color: $offwhite;
+  color: $base-body-color;
   background: $dark-gray;
 
   &.shine,

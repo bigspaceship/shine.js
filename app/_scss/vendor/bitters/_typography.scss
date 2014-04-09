@@ -10,6 +10,7 @@ body {
 h1, h2, h3, h4, h5, h6 {
   font-family: $header-font-family;
   font-weight: $heavy-font-weight;
+  color: $base-header-color;
   line-height: 1.25em;
   margin: 0;
   text-rendering: optimizeLegibility; // Fix the character spacing for headings

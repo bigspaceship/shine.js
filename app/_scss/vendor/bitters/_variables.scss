@@ -2,8 +2,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 $serif: $georgia;
 // $sans-serif: 'Open Sans', sans-serif;
-$sans-serif: 'Roboto', sans-serif;
-$sans-serif-condensed: 'Roboto Condensed', sans-serif;
+$sans-serif: Helvetica, sans-serif;
+$sans-serif-condensed: Helvetica, sans-serif;
 $monospace: 'Inconsolata', Courier, monospace;;
 
 $base-font-family: $sans-serif;
@@ -24,22 +24,25 @@ $blue: #477DCA;
 $dark-gray: #333;
 $offdark-gray: #3c3c3c;
 $medium-gray: #999;
-$light-gray: #DDD;
+$light-gray: #eee;
 $light-red: #FBE3E4;
 $light-yellow: #FFF6BF;
 $light-green: #E6EFC2;
 $offwhite: #f7f7f7;
 
 // Body Color
-$base-body-color: white;
+$base-body-color: #bbb;
 
 //  Font Colors
 $base-font-color: $dark-gray;
-$base-accent-color: $blue;
+$base-accent-color: white;
 
 //  Text Link Colors
 $base-link-color: $base-accent-color;
-$hover-link-color: darken($base-accent-color, 15);
+$hover-link-color: darken($base-link-color, 15);
+
+// Header Colors
+$base-header-color: white;
 
 // Border color
 $base-border-color: $light-gray;

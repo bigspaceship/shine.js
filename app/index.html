@@ -4,8 +4,8 @@ title: shine.js
 ---
 
 <header class="big-banner tall demo-header">
-  <h1 class="shine large light">SHINE.JS</h1>
-  <p class="shine light medium">A LIBRARY FOR PRETTY SHADOWS.</p>
+  <h1 class="shine large light shine-text-color">shine.js</h1>
+  <p class="medium shine-text-color shine-text-color-dark">A library for pretty shadows.</p>
 </header>
 
 <section class="dark">
@@ -18,20 +18,14 @@ title: shine.js
       <a class="button" href="https://github.com/bigspaceship/shine.js/archive/master.zip">Download as ZIP</a>
     </p>
     <h3>Make it Shine</h3>
-    <div>
-      <p>Instantiate shine.js:</p>
+    <p>Instantiate shine.js:</p>
 {% highlight javascript %}var shine = new Shine(document.getElementById('my-shine-object'));{% endhighlight %}
-      <p>Change the light position:</p>
+    <p>Change the light position:</p>
 {% highlight javascript %}window.addEventListener('mousemove', function(event) {
-  shine.light.position.x = event.clientX;
-  shine.light.position.y = event.clientY;
-  shine.draw();
+shine.light.position.x = event.clientX;
+shine.light.position.y = event.clientY;
+shine.draw();
 }, false);{% endhighlight %}
-    </div>
-</section>
-
-<section class="light">
-  <div class="container">
     <h3>Features</h3>
     <ul class="default-ul">
       <li>Dynamic light positions</li>
