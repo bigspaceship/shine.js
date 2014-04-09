@@ -71,7 +71,7 @@ shineC.draw(); // make sure to re-draw
 The Shine constructor. Instantiate as `new Shine(...)` to create a new instance.
 
 | Parameter | Type | Description
-| ---
+| --- | --- | ---
 | **domElement** | `!HTMLElement` | The DOM element to apply the shine effect to.
 | **optConfig** | `?shinejs.Config=` | Optional config instance. If no instance is passed it a new instance with default values will be stored in the `config` property.
 | **optClassPrefix** | `?string=` | Optional class prefix that will be applied to all shine DOM elements. Defaults to `shine-`.
@@ -90,7 +90,7 @@ Releases all resources and removes event listeners. Destroyed instance can't be 
 Re-initializes all shadows. Use this when you want to change the text or the domElement's contents have changed.
 
 | Parameter | Type | Description
-| ---
+| --- | --- | ---
 | **optText** | `?string=` | If defined, will replace the DOM element's textContent. If omitted, the content will be read from the DOM element.
 
 ### Shine.prototype.enableAutoUpdates()
@@ -104,7 +104,7 @@ Removes DOM event listeners to automatically update all properties.
 ### Shine Properties
 
 | Property | Type | Description
-| ---
+| --- | --- | ---
 | **domElement** | `HTMLElement` | The DOM element to apply the shine effect to.
 | **config** | `shinejs.Config` | Stores all config parameters.
 | **light** | `shinejs.Light` | Stores the light position and intensity.
@@ -116,13 +116,13 @@ Removes DOM event listeners to automatically update all properties.
 The shine config constructor. Pass an optional settings object from which to read values.
 
 | Parameter | Type | Description
-| ---
+| --- | --- | ---
 | **optSettings** | `?Object=` | An optional object containing config parameters.
 
 ### shinejs.Config Properties
 
 | Property | Type | Default | Description
-| ---
+| --- | --- | --- | ---
 |**numSteps** | `number` | `8` | The number of steps drawn in each shadow
 |**opacity** | `number` | `0.1` | The opacity of each shadow (range: 0...1)
 |**opacityPow** | `number` | `1.2` | The exponent applied to each step's opacity (1.0 = linear opacity).
@@ -139,13 +139,13 @@ The shine config constructor. Pass an optional settings object from which to rea
 The light constructor. Pass an optional position to apply by default.
 
 | Parameter | Type | Description
-| ---
+| --- | --- | ---
 | **optPosition** | `?shinejs.Point=` | An position. Defaults to `new shinejs.Point(0, 0)`.
 
 ### shinejs.Light Properties
 
 | Property | Type | Default | Description
-| ---
+| --- | --- | --- | ---
 |**position** | `shinejs.Point` | `new shinejs.Point(0, 0)` | The position of this light.
 |**intensity** | `number` | `1.0` | The intensity of this light. Gets multiplied with shadow opacity.
 
@@ -156,14 +156,14 @@ The light constructor. Pass an optional position to apply by default.
 A 2D point class.
 
 | Parameter | Type | Description
-| ---
+| --- | --- | ---
 | **x** | `number=` | The x-coordinate. Defaults to `0`.
 | **y** | `number=` | The y-coordinate. Defaults to `0`.
 
 ### shinejs.Point Properties
 
 | Property | Type | Default | Description
-| ---
+| --- | --- | --- | ---
 |**x** | `number` | `0` | The x-coordinate.
 |**y** | `number` | `0` | The y-coordinate.
 
@@ -172,5 +172,5 @@ A 2D point class.
 Returns a new instance of `shinejs.Point` with the x- and y-distance between this instance and the point `p`.
 
 | Parameter | Type | Description
-| ---
+| --- | --- | ---
 | **p** | `shinejs.Point` | The point to which to calculate the distance to. Distance will be expressed as `this.x - p.x` and `this.y - p.y`.
