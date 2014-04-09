@@ -150,12 +150,13 @@ exports.Config.prototype.applyValues = function(settings) {
 
 /**
  * @constructor
+ * @param {?exports.Point=} optPosition An optional position. Defaults to (0, 0).
  */
-exports.Light = function Light() {
+exports.Light = function Light(optPosition) {
   /**
    * @type {exports.Point}
    */
-  this.position = new exports.Point(0, 0);
+  this.position = optPosition || new exports.Point(0, 0);
 
   /**
    * @type {number}
@@ -540,13 +541,14 @@ exports.Shine = function(domElement, optConfig, optClassPrefix, optShadowPropert
     throw new Error('No valid DOM element passed as first parameter');
   }
 
+  this.light = new exports.Light();
+  this.config = optConfig || new exports.Config();
+  this.domElement = domElement;
+
   this.classPrefix = optClassPrefix || 'shine-';
   this.shadowProperty = optShadowProperty ||
     (this.elememtHasTextOnly(domElement) ? 'textShadow' : 'boxShadow');
 
-  this.domElement = domElement;
-  this.light = new exports.Light();
-  this.config = optConfig || new exports.Config();
   this.shadows = [];
   this.splitter = new exports.Splitter(domElement, this.classPrefix);
 
@@ -659,6 +661,7 @@ exports.Shine.prototype.disableAutoUpdates = function() {
 
 /**
  * The CSS to inject into the header.
+ * @protected
  * @return {string}
  */
 exports.Shine.prototype.getCSS = function() {
@@ -690,6 +693,7 @@ exports.Shine.prototype.getCSS = function() {
 
 /**
  * Prefixes a CSS property.
+ * @protected
  * @return {string}
  */
 exports.Shine.prototype.getPrefixed = function(property) {
@@ -715,6 +719,7 @@ exports.Shine.prototype.getPrefixed = function(property) {
 
 /**
  * Checks whether a DOM element only contains childNodes of type TEXT_NODE (3).
+ * @protected
  * @param {HTMLElement} domElement
  * @return {boolean}
  */
