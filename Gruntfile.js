@@ -17,7 +17,11 @@ module.exports = function(grunt) {
         stripBanners: true
       },
       dist: {
-        src: ['lib/<%= pkg.name %>.*.js', 'lib/shine.js'],
+        src: [
+            'lib/function.bind.polyfill.js',
+            'lib/<%= pkg.name %>.*.js',
+            'lib/shine.js'
+          ],
         dest: 'dist/<%= pkg.name %>.js'
       }
     },

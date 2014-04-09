@@ -1,6 +1,32 @@
 /*! shine.js - v0.1.0 - 2014-04-09
 * http://bigspaceship.github.io/shine.js
 * Copyright (c) 2014 Big Spaceship; Licensed MIT */
+/* jshint ignore:start */
+if (!Function.prototype.bind) {
+  Function.prototype.bind = function (oThis) {
+    if (typeof this !== "function") {
+      // closest thing possible to the ECMAScript 5 internal IsCallable function
+      throw new TypeError("Function.prototype.bind - what is trying to be bound is not callable");
+    }
+
+    var aArgs = Array.prototype.slice.call(arguments, 1),
+        fToBind = this,
+        fNOP = function () {},
+        fBound = function () {
+          return fToBind.apply(this instanceof fNOP && oThis
+                                 ? this
+                                 : oThis,
+                               aArgs.concat(Array.prototype.slice.call(arguments)));
+        };
+
+    fNOP.prototype = this.prototype;
+    fBound.prototype = new fNOP();
+
+    return fBound;
+  };
+}
+/* jshint ignore:end */
+
 'use strict';
 
 /**
@@ -74,35 +100,32 @@ exports.Point.prototype.delta = function(p) {
  * @param {?Object=} optSettings An optional settings file with existing values.
  *
  * Valid settings are:
- *  * stepSize
- *  * maxSteps
- *  * opacityMultiplier
+ *  * numSteps
+ *  * opacity
  *  * opacityPow
- *  * offsetMultiplier
+ *  * offset
  *  * offsetPow
- *  * blurMultiplier
+ *  * blur
  *  * blurPow
  *  * maxBlurRadius
  *  * shadowRGB
  */
 exports.ShadowConfig = function(optSettings) {
   /** @type {number} */
-  this.stepSize = 8;
-  /** @type {number} */
-  this.maxSteps = 5;
+  this.numSteps = 5;
 
   /** @type {number} */
-  this.opacityMultiplier = 0.15;
+  this.opacity = 0.15;
   /** @type {number} */
   this.opacityPow = 1.2;
 
   /** @type {number} */
-  this.offsetMultiplier = 0.15;
+  this.offset = 0.15;
   /** @type {number} */
   this.offsetPow = 1.8;
 
   /** @type {number} */
-  this.blurMultiplier = 0.1;
+  this.blur = 0.1;
   /** @type {number} */
   this.blurPow = 1.4;
   /** @type {number} */
@@ -166,24 +189,21 @@ exports.Shadow.prototype.draw = function(light) {
   var config = this.config;
   var delta = this.position.delta(light.position);
   var distance = Math.sqrt(delta.x * delta.x + delta.y * delta.y);
-  distance = Math.max(40, distance);  // keep a min amount of shadow
-
-  var numSteps = distance / config.stepSize;
-  numSteps = Math.min(config.maxSteps, Math.round(numSteps));
+  distance = Math.max(32, distance);  // keep a min amount of shadow
 
   var shadows = [];
 
-  for (var i = 0; i < numSteps; i++) {
-    var ratio = i / numSteps;
+  for (var i = 0; i < config.numSteps; i++) {
+    var ratio = i / config.numSteps;
 
     var ratioOpacity = Math.pow(ratio, config.opacityPow);
     var ratioOffset = Math.pow(ratio, config.offsetPow);
     var ratioBlur = Math.pow(ratio, config.blurPow);
 
-    var opacity = light.intensity * Math.max(0, config.opacityMultiplier * (1.0 - ratioOpacity));
-    var offsetX = - config.offsetMultiplier * delta.x * ratioOffset;
-    var offsetY = - config.offsetMultiplier * delta.y * ratioOffset;
-    var blurRadius = config.blurMultiplier * distance * ratioBlur;
+    var opacity = light.intensity * Math.max(0, config.opacity * (1.0 - ratioOpacity));
+    var offsetX = - config.offset * delta.x * ratioOffset;
+    var offsetY = - config.offset * delta.y * ratioOffset;
+    var blurRadius = config.blur * distance * ratioBlur;
     blurRadius = Math.min(config.maxBlurRadius, blurRadius);
 
     var shadow = this.getShadow(config.shadowRGB, opacity, offsetX, offsetY, blurRadius);
@@ -222,13 +242,11 @@ exports.Shadow.prototype.enableAutoUpdates = function() {
   this.disableAutoUpdates();
 
   // store reference fore more efficient minification
-  var self = this;
-  var fnHandleViewportUpdate = this.fnHandleViewportUpdate = function(){
-    self.handleViewportUpdate();
-  };
+  var fnHandleViewportUpdate = this.fnHandleViewportUpdate =
+    this.handleViewportUpdate.bind(this);
 
   document.addEventListener('resize', fnHandleViewportUpdate, false);
-  document.addEventListener('load', fnHandleViewportUpdate, false);
+  window.addEventListener('load', fnHandleViewportUpdate, false);
   window.addEventListener('resize', fnHandleViewportUpdate, false);
   window.addEventListener('scroll', fnHandleViewportUpdate, false);
 };
@@ -249,7 +267,7 @@ exports.Shadow.prototype.disableAutoUpdates = function() {
   this.fnHandleViewportUpdate = null;
 
   document.removeEventListener('resize', fnHandleViewportUpdate, false);
-  document.removeEventListener('load', fnHandleViewportUpdate, false);
+  window.removeEventListener('load', fnHandleViewportUpdate, false);
   window.removeEventListener('resize', fnHandleViewportUpdate, false);
   window.removeEventListener('scroll', fnHandleViewportUpdate, false);
 };
@@ -575,10 +593,7 @@ exports.Shine.prototype.enableAutoUpdates = function() {
   this.areAutoUpdatesEnabled = true;
 
   // store reference fore more efficient minification
-  var self = this;
-  var fnDrawHandler = this.fnDrawHandler = function(){
-    self.draw();
-  };
+  var fnDrawHandler = this.fnDrawHandler = this.draw.bind(this);
 
   window.addEventListener('scroll', fnDrawHandler, false);
   window.addEventListener('resize', fnDrawHandler, false);
