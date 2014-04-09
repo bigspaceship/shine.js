@@ -46,7 +46,6 @@ p {
 a {
   color: $base-link-color;
   text-decoration: none;
-  @include transition(color 0.1s linear);
 
   &:hover {
     color: $hover-link-color;

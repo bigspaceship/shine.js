@@ -1,35 +1,66 @@
-%button-outer {
+@keyframes button_slide {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+%button {
+  $ease-in-quad: cubic-bezier(0.55, 0.085, 0.68, 0.53);
+  $ease-out-quad: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  $ease-in-quart: cubic-bezier(0.895, 0.03, 0.685, 0.22);
+  $ease-out-quart: cubic-bezier(0.165, 0.84, 0.44, 1);
+
+  $ease-in-cubic: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+  $ease-out-cubic: cubic-bezier(0.215, 0.61, 0.355, 1);
+
   display: inline-block;
+  position: relative;
   margin: 0.25em 0;
-  border-radius: 4px;
+  padding: 1em;
+  line-height: 1em;
+  border-radius: $base-border-radius;
+  overflow: hidden;
 
   font-weight: $heavy-font-weight;
   font-family: $sans-serif-condensed;
-  background: $dark-gray;
-}
-
-%button-inner {
-  display: inline-block;
-  padding: 1em;
-  line-height: 1em;
   text-transform: uppercase;
-  color: white;
 
-  &:hover {
-    color: darken(white, 20%);
+  background: white;
+  color: $dark-gray;
+
+  &:after,
+  &:before {
+    content: '';
+    overflow: hidden;
+    position: absolute;
+    background: rgba(0, 0, 0, 0.1);
+    top: 0;
+    left: -10%;
+
+    width: 0;
+    height: 100%;
+    transition: width 300ms $ease-in-quad;
+    transform: skewX(-15deg);
   }
 
-  .dark & {
-    background: white;
+  &:after {
+    transition-delay: 100ms;
+  }
+
+  &:hover {
     color: $dark-gray;
 
-    &:hover {
-      color: lighten($dark-gray, 20%);
+    &:after,
+    &:before {
+      width: 120%;
     }
   }
 }
 
 .button {
-  @extend %button-outer;
-  @extend %button-inner;
+  @extend %button;
 }
