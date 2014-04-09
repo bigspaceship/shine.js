@@ -37,25 +37,18 @@ shine.draw(); // make sure to re-draw
 Create a shared `shinejs.Config` instance:
 
 ```javascript
-// default values used:
+// all parameters are optional and can be changed later
 var config = new shinejs.Config({
-  numSteps: 8, // The number of steps drawn in each shadow
-  opacity: 0.1, // The opacity of each shadow (range: 0...1)
-  opacityPow: 1.2, // The exponent applied to each step's opacity (1.0 = linear opacity).
-  offset: 0.15, // Larger offsets create longer shadows
-  offsetPow: 1.8, // The exponent applied to each step's offset (1.0 = linear offset).
-  blur: 40, // The strength of the shadow blur.
-  blurPow: 1.4, // The exponent applied to each step's blur (1.0 = linear blur).
-  shadowRGB: new shinejs.Color(0, 0, 0), // The shadow color in r, g, b (0...255)
+  numSteps: 4,
+  opacity: 0.2,
+  shadowRGB: new shinejs.Color(255, 0, 0)
 });
 
-// pass it in the constructor
-
+// pass the config in the constructor
 var shineA = new Shine(document.getElementById('my-shine-object-a'), config);
 var shineB = new Shine(document.getElementById('my-shine-object-b'), config);
 
-// or assign later
-
+// or assign it to an instance later
 var shineC = new Shine(document.getElementById('my-shine-object-c'));
 shineC.config = config;
 shineC.draw(); // make sure to re-draw
