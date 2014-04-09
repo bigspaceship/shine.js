@@ -3,18 +3,7 @@
 'use strict';
 
 function ShineDemo() {
-  this.config = new shinejs.ShadowConfig({
-    stepSize: 8,
-    maxSteps: 5,
-    opacity: 0.15,
-    opacityPow: 1.2,
-    offset: 0.15,
-    offsetPow: 1.8,
-    blur: 0.1,
-    blurPow: 1.4,
-    maxBlurRadius: 64,
-    shadowRGB: new shinejs.Color(0, 0, 0)
-  });
+  this.config = new shinejs.Config();
   this.colors = {
     text: '#f7f7f7',
     shadow: '#000',
@@ -59,9 +48,8 @@ ShineDemo.prototype.initGui = function() {
   shadowFolder.add(this.config, 'opacityPow').min(0).max(8).step(0.05).onChange(fnDraw);
   shadowFolder.add(this.config, 'offset').min(0).max(1).step(0.01).onChange(fnDraw);
   shadowFolder.add(this.config, 'offsetPow').min(0).max(4).step(0.05).onChange(fnDraw);
-  shadowFolder.add(this.config, 'blur').min(0).max(1).step(0.025).onChange(fnDraw);
+  shadowFolder.add(this.config, 'blur').min(0).max(128).step(1).onChange(fnDraw);
   shadowFolder.add(this.config, 'blurPow').min(0).max(4).step(0.05).onChange(fnDraw);
-  shadowFolder.add(this.config, 'maxBlurRadius').min(0).max(128).step(4).onChange(fnDraw);
 
   colorFolder.addColor(this.colors, 'text').onChange(fnUpdateColor);
   colorFolder.addColor(this.colors, 'shadow').onChange(fnUpdateColor);

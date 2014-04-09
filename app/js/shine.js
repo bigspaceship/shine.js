@@ -1,4 +1,4 @@
-/*! shine.js - v0.1.0 - 2014-04-09
+/*! shine.js - v0.2.1 - 2014-04-09
 * http://bigspaceship.github.io/shine.js
 * Copyright (c) 2014 Big Spaceship; Licensed MIT */
 /* jshint ignore:start */
@@ -88,13 +88,75 @@ exports.Color.prototype.getRGBAString = function() {
 'use strict';
 
 /**
+ * Creates a new Config instance that can be shared across multiple
+ * Shadow instance.
+ *
  * @constructor
+ * @param {?Object=} optSettings An optional settings file with existing values.
+ *
+ * Valid settings are:
+ *  * numSteps
+ *  * opacity
+ *  * opacityPow
+ *  * offset
+ *  * offsetPow
+ *  * blur
+ *  * blurPow
+ *  * maxBlurRadius
+ *  * shadowRGB
  */
-exports.Light = function Light() {
+exports.Config = function(optSettings) {
+  /** @type {number} */
+  this.numSteps = 5;
+
+  /** @type {number} */
+  this.opacity = 0.15;
+  /** @type {number} */
+  this.opacityPow = 1.2;
+
+  /** @type {number} */
+  this.offset = 0.15;
+  /** @type {number} */
+  this.offsetPow = 1.8;
+
+  /** @type {number} */
+  this.blur = 40;
+  /** @type {number} */
+  this.blurPow = 1.0;
+
+  /** @type {!exports.Color} */
+  this.shadowRGB = new exports.Color(0, 0, 0);
+
+  this.applyValues(optSettings);
+};
+
+/**
+ * Extends this instance with all valid values from <code>settings</code>.
+ * @param {?Object=} settings An object containing the properties to override.
+ */
+exports.Config.prototype.applyValues = function(settings) {
+  if (!settings) {
+    return;
+  }
+
+  for (var key in this) {
+    if (key in settings) {
+      this[key] = settings[key];
+    }
+  }
+};
+
+'use strict';
+
+/**
+ * @constructor
+ * @param {?exports.Point=} optPosition An optional position. Defaults to (0, 0).
+ */
+exports.Light = function Light(optPosition) {
   /**
    * @type {exports.Point}
    */
-  this.position = new exports.Point(0, 0);
+  this.position = optPosition || new exports.Point(0, 0);
 
   /**
    * @type {number}
@@ -128,79 +190,14 @@ exports.Point.prototype.delta = function(p) {
 'use strict';
 
 /**
- * Creates a new ShadowConfig instance that can be shared across multiple
- * Shadow instance.
- *
- * @constructor
- * @param {?Object=} optSettings An optional settings file with existing values.
- *
- * Valid settings are:
- *  * numSteps
- *  * opacity
- *  * opacityPow
- *  * offset
- *  * offsetPow
- *  * blur
- *  * blurPow
- *  * maxBlurRadius
- *  * shadowRGB
- */
-exports.ShadowConfig = function(optSettings) {
-  /** @type {number} */
-  this.numSteps = 5;
-
-  /** @type {number} */
-  this.opacity = 0.15;
-  /** @type {number} */
-  this.opacityPow = 1.2;
-
-  /** @type {number} */
-  this.offset = 0.15;
-  /** @type {number} */
-  this.offsetPow = 1.8;
-
-  /** @type {number} */
-  this.blur = 0.1;
-  /** @type {number} */
-  this.blurPow = 1.4;
-  /** @type {number} */
-  this.maxBlurRadius = 64;
-  /** @type {!exports.Color} */
-  this.shadowRGB = new exports.Color(0, 0, 0);
-
-  this.applyValues(optSettings);
-};
-
-/**
- * Extends this instance with all valid values from <code>settings</code>.
- * @param {?Object=} settings An object containing the properties to override.
- */
-exports.ShadowConfig.prototype.applyValues = function(settings) {
-  if (!settings) {
-    return;
-  }
-
-  for (var key in this) {
-    if (key in settings) {
-      this[key] = settings[key];
-    }
-  }
-};
-
-'use strict';
-
-/**
  * @constructor
  * @param {!HTMLElement} domElement
- * @param {!ShadowConfig} config
  */
-exports.Shadow = function(domElement, config) {
+exports.Shadow = function(domElement) {
   /** @type {!exports.Point} */
   this.position = new exports.Point(0, 0);
   /** @type {!HTMLElement} */
   this.domElement = domElement;
-  /** @type {!ShadowConfig} */
-  this.config = config;
 
   /** @type {!string} */
   this.shadowProperty = 'textShadow';
@@ -218,10 +215,10 @@ exports.Shadow = function(domElement, config) {
 /**
  * Draw this shadow with based on a light source
  * @param {exports.Light} light
+ * @param {!Config} config
  */
-exports.Shadow.prototype.draw = function(light) {
+exports.Shadow.prototype.draw = function(light, config) {
 
-  var config = this.config;
   var delta = this.position.delta(light.position);
   var distance = Math.sqrt(delta.x * delta.x + delta.y * delta.y);
   distance = Math.max(32, distance);  // keep a min amount of shadow
@@ -238,8 +235,7 @@ exports.Shadow.prototype.draw = function(light) {
     var opacity = light.intensity * Math.max(0, config.opacity * (1.0 - ratioOpacity));
     var offsetX = - config.offset * delta.x * ratioOffset;
     var offsetY = - config.offset * delta.y * ratioOffset;
-    var blurRadius = config.blur * distance * ratioBlur;
-    blurRadius = Math.min(config.maxBlurRadius, blurRadius);
+    var blurRadius = distance * config.blur * ratioBlur / 512;
 
     var shadow = this.getShadow(config.shadowRGB, opacity, offsetX, offsetY, blurRadius);
     shadows.push(shadow);
@@ -534,7 +530,7 @@ exports.StyleInjector.prototype.inject = function(css, doc) {
  * @param {!HTMLElement} domElement The element to apply the shine effect to.
  *                                  This element may contain text content only
  *                                  and have no children.
- * @param {!ShadowConfig} optConfig An optional ShadowConfig instance.
+ * @param {!Config} optConfig An optional Config instance.
  * @param {?string=} optClassPrefix An optional class-prefix applied to all
  *                                  injected styles. Defaults to 'shine-'.
  * @param {?string=} optShadowProperty Can be 'textShadow' or 'boxShadow'.
@@ -545,13 +541,14 @@ exports.Shine = function(domElement, optConfig, optClassPrefix, optShadowPropert
     throw new Error('No valid DOM element passed as first parameter');
   }
 
+  this.light = new exports.Light();
+  this.config = optConfig || new exports.Config();
+  this.domElement = domElement;
+
   this.classPrefix = optClassPrefix || 'shine-';
   this.shadowProperty = optShadowProperty ||
     (this.elememtHasTextOnly(domElement) ? 'textShadow' : 'boxShadow');
 
-  this.domElement = domElement;
-  this.light = new exports.Light();
-  this.config = optConfig || new exports.ShadowConfig();
   this.shadows = [];
   this.splitter = new exports.Splitter(domElement, this.classPrefix);
 
@@ -581,7 +578,7 @@ exports.Shine.prototype.destroy = function() {
  */
 exports.Shine.prototype.draw = function() {
   for (var i = this.shadows.length - 1; i >= 0; i--) {
-    this.shadows[i].draw(this.light);
+    this.shadows[i].draw(this.light, this.config);
   }
 };
 
@@ -603,13 +600,13 @@ exports.Shine.prototype.updateContent = function(optText) {
 
   this.shadows.length = 0;
 
-  this.splitter.split(optText, !this.elememtHasTextOnly(this.domElement));
+  this.splitter.split(optText, !optText && !this.elememtHasTextOnly(this.domElement));
 
   var shadowProperty = this.getPrefixed(this.shadowProperty);
 
   for (var j = 0; j < this.splitter.elements.length; j++) {
     var element = this.splitter.elements[j];
-    var shadow = new exports.Shadow(element, this.config);
+    var shadow = new exports.Shadow(element);
     shadow.shadowProperty = shadowProperty;
     this.shadows.push(shadow);
   }
@@ -664,6 +661,7 @@ exports.Shine.prototype.disableAutoUpdates = function() {
 
 /**
  * The CSS to inject into the header.
+ * @protected
  * @return {string}
  */
 exports.Shine.prototype.getCSS = function() {
@@ -695,6 +693,7 @@ exports.Shine.prototype.getCSS = function() {
 
 /**
  * Prefixes a CSS property.
+ * @protected
  * @return {string}
  */
 exports.Shine.prototype.getPrefixed = function(property) {
@@ -720,6 +719,7 @@ exports.Shine.prototype.getPrefixed = function(property) {
 
 /**
  * Checks whether a DOM element only contains childNodes of type TEXT_NODE (3).
+ * @protected
  * @param {HTMLElement} domElement
  * @return {boolean}
  */
