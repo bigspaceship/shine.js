@@ -1,3 +1,7 @@
+/* global shinejs, dat */
+
+'use strict';
+
 function ShineDemo() {
   this.config = new shinejs.ShadowConfig({
     stepSize: 8,
@@ -91,7 +95,7 @@ ShineDemo.prototype.destroyShines = function() {
   }
 
   for (var i = 0; i < this.shines.length; i++) {
-    var shine = shines[i];
+    var shine = this.shines[i];
     shine.destroy();
   }
 
