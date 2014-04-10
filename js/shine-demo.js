@@ -131,8 +131,8 @@ ShineDemo.prototype.handleOrientationChange = function(event) {
   var beta = - Math.PI * event.beta / 180;
   var gamma = - Math.PI * event.gamma / 180;
 
-  var x = 2.0 * radiusX * Math.sin(gamma);
-  var y = 2.0 * radiusY * Math.sin(beta);
+  var x = 3.0 * radiusX * Math.sin(gamma);
+  var y = 3.0 * radiusY * Math.sin(beta);
 
   this.lightPosition.x = radiusX + x;
   this.lightPosition.y = radiusY + y;
