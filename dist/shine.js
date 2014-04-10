@@ -30,6 +30,18 @@ if (!Function.prototype.bind) {
 'use strict';
 
 /**
+ * window.performance.now() polyfill
+ * @type {Object.<string, Function>}
+ */
+window.performance = window.performance || window.webkitPeformance || window.mozPeformance || {
+  'now': function(){
+    return new Date().getTime();
+  }
+};
+
+'use strict';
+
+/**
  * @constructor
  * @param {number=} r 0...255
  * @param {number=} g 0...255
@@ -102,7 +114,6 @@ exports.Color.prototype.getRGBAString = function() {
  *  * offsetPow
  *  * blur
  *  * blurPow
- *  * maxBlurRadius
  *  * shadowRGB
  */
 exports.Config = function(optSettings) {
@@ -271,7 +282,7 @@ exports.Shadow.prototype.draw = function(light, config) {
  */
 exports.Shadow.prototype.getShadow = function(colorRGB, opacity, offsetX, offsetY, blurRadius) {
   var color = 'rgba(' + colorRGB.r + ', ' + colorRGB.g + ', ' + colorRGB.b + ', ' + opacity + ')';
-  return color + ' ' + offsetX + 'px ' + offsetY + 'px ' + blurRadius + 'px';
+  return color + ' ' + offsetX + 'px ' + offsetY + 'px ' + Math.round(blurRadius) + 'px';
 };
 
 /**
@@ -290,7 +301,8 @@ exports.Shadow.prototype.enableAutoUpdates = function() {
 
   // store reference fore more efficient minification
   var fnHandleViewportUpdate = this.fnHandleViewportUpdate =
-    this.handleViewportUpdate.bind(this);
+    exports.Timing.debounce(this.handleViewportUpdate, 1000/15, this);
+    // this.handleViewportUpdate.bind(this);
 
   document.addEventListener('resize', fnHandleViewportUpdate, false);
   window.addEventListener('resize', fnHandleViewportUpdate, false);
@@ -321,6 +333,7 @@ exports.Shadow.prototype.disableAutoUpdates = function() {
  * @private Called when DOM event listeners fire
  */
 exports.Shadow.prototype.handleViewportUpdate = function() {
+  console.log('vp update');
   var boundingRect = this.domElement.getBoundingClientRect();
   this.position.x = boundingRect.left + boundingRect.width * 0.5;
   this.position.y = boundingRect.top + boundingRect.height * 0.5;
@@ -540,6 +553,92 @@ exports.StyleInjector.prototype.inject = function(css, doc) {
   this.injections[css] = doc;
 
   return domElement;
+};
+
+'use strict';
+
+exports.Timing = function() {
+
+};
+
+/**
+ * Debounces a function to only be called once with a minimum delay
+ * of <code>delay</code>ms.
+ *
+ * Loosely based on http://remysharp.com/2010/07/21/throttling-function-calls/
+ *
+ * @param {Function} fnCallback The callback function
+ * @param {number} delay The delay in ms. Defaults to 0.
+ * @param {*} context The context to which to apply the function on.
+ *                    Defaults to this.
+ * @return {Function} The debounced function.
+ */
+exports.Timing.debounce = function(fnCallback, delay, context) {
+
+  var timeoutId = NaN;
+
+  return function() {
+    delay = delay || 0;
+    context = context || this;
+    var currentArguments = arguments;
+
+    if (!isNaN(timeoutId)) {
+      clearTimeout(timeoutId);
+    }
+
+    timeoutId = setTimeout(function() {
+      fnCallback.apply(context, currentArguments);
+    }, delay);
+  };
+};
+
+
+/**
+ * Throttles a function to only be called with a delay of <code>delay</code>ms.
+ *
+ * Will always execute the first time immediately.
+ *
+ * Loosely based on http://remysharp.com/2010/07/21/throttling-function-calls/
+ *
+ * @param {Function} fnCallback The callback function
+ * @param {number} delay The delay in ms. Defaults to 0.
+ * @param {*} context The context to which to apply the function on.
+ *                    Defaults to this.
+ * @return {Function} The throttled function.
+ */
+exports.Timing.throttle = function(fnCallback, delay, context) {
+
+  var previousTimestamp = NaN;
+  var timeoutId = NaN;
+
+  return function() {
+    delay = delay || 0;
+    context = context || this;
+
+    // requires performance.now() polyfill
+    var currentTimestamp = window.performance.now();
+    var currentArguments = arguments;
+
+    if (!isNaN(previousTimestamp) && currentTimestamp < previousTimestamp +
+      delay) {
+      // clear if we haven't waited long enough
+      if (!isNaN(timeoutId)) {
+        clearTimeout(timeoutId);
+      }
+
+      // delay execution by delay ms
+      timeoutId = setTimeout(function() {
+        previousTimestamp = currentTimestamp;
+        fnCallback.apply(context, currentArguments);
+      }, delay);
+    } else {
+      if (!isNaN(timeoutId)) {
+        clearTimeout(timeoutId);
+      }
+      previousTimestamp = currentTimestamp;
+      fnCallback.apply(context, currentArguments);
+    }
+  };
 };
 
 'use strict';

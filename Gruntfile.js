@@ -19,6 +19,7 @@ module.exports = function(grunt) {
       dist: {
         src: [
             'lib/function.bind.polyfill.js',
+            'lib/performance.now.polyfill.js',
             'lib/<%= pkg.name %>.*.js',
             'lib/shine.js'
           ],
