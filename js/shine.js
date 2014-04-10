@@ -1,4 +1,4 @@
-/*! shine.js - v0.2.1 - 2014-04-09
+/*! shine.js - v0.2.4 - 2014-04-10
 * http://bigspaceship.github.io/shine.js
 * Copyright (c) 2014 Big Spaceship; Licensed MIT */
 /* jshint ignore:start */
@@ -26,6 +26,18 @@ if (!Function.prototype.bind) {
   };
 }
 /* jshint ignore:end */
+
+'use strict';
+
+/**
+ * window.performance.now() polyfill
+ * @type {Object.<string, Function>}
+ */
+window.performance = window.performance || window.webkitPeformance || window.mozPeformance || {
+  'now': function(){
+    return new Date().getTime();
+  }
+};
 
 'use strict';
 
@@ -102,7 +114,6 @@ exports.Color.prototype.getRGBAString = function() {
  *  * offsetPow
  *  * blur
  *  * blurPow
- *  * maxBlurRadius
  *  * shadowRGB
  */
 exports.Config = function(optSettings) {
@@ -207,9 +218,25 @@ exports.Shadow = function(domElement) {
    * @type {Function}
    */
   this.fnHandleViewportUpdate = null;
+  this.fnHandleWindowLoaded = this.handleWindowLoaded.bind(this);
 
   this.enableAutoUpdates();
   this.handleViewportUpdate();
+
+  // this.fnHandleViewportUpdate will get set in enableAutoUpdates();
+  window.addEventListener('load', this.fnHandleWindowLoaded, false);
+};
+
+/**
+ * Removes all listeners and frees resources.
+ * Destroyed instances can't be reused.
+ */
+exports.Shadow.prototype.destroy = function() {
+  window.removeEventListener('load', this.fnHandleWindowLoaded, false);
+  this.disableAutoUpdates();
+  this.fnHandleWindowLoaded = null;
+  this.domElement = null;
+  this.position = null;
 };
 
 /**
@@ -255,7 +282,7 @@ exports.Shadow.prototype.draw = function(light, config) {
  */
 exports.Shadow.prototype.getShadow = function(colorRGB, opacity, offsetX, offsetY, blurRadius) {
   var color = 'rgba(' + colorRGB.r + ', ' + colorRGB.g + ', ' + colorRGB.b + ', ' + opacity + ')';
-  return color + ' ' + offsetX + 'px ' + offsetY + 'px ' + blurRadius + 'px';
+  return color + ' ' + offsetX + 'px ' + offsetY + 'px ' + Math.round(blurRadius) + 'px';
 };
 
 /**
@@ -274,10 +301,10 @@ exports.Shadow.prototype.enableAutoUpdates = function() {
 
   // store reference fore more efficient minification
   var fnHandleViewportUpdate = this.fnHandleViewportUpdate =
-    this.handleViewportUpdate.bind(this);
+    exports.Timing.debounce(this.handleViewportUpdate, 1000/15, this);
+    // this.handleViewportUpdate.bind(this);
 
   document.addEventListener('resize', fnHandleViewportUpdate, false);
-  window.addEventListener('load', fnHandleViewportUpdate, false);
   window.addEventListener('resize', fnHandleViewportUpdate, false);
   window.addEventListener('scroll', fnHandleViewportUpdate, false);
 };
@@ -298,7 +325,6 @@ exports.Shadow.prototype.disableAutoUpdates = function() {
   this.fnHandleViewportUpdate = null;
 
   document.removeEventListener('resize', fnHandleViewportUpdate, false);
-  window.removeEventListener('load', fnHandleViewportUpdate, false);
   window.removeEventListener('resize', fnHandleViewportUpdate, false);
   window.removeEventListener('scroll', fnHandleViewportUpdate, false);
 };
@@ -307,9 +333,17 @@ exports.Shadow.prototype.disableAutoUpdates = function() {
  * @private Called when DOM event listeners fire
  */
 exports.Shadow.prototype.handleViewportUpdate = function() {
+  console.log('vp update');
   var boundingRect = this.domElement.getBoundingClientRect();
   this.position.x = boundingRect.left + boundingRect.width * 0.5;
   this.position.y = boundingRect.top + boundingRect.height * 0.5;
+};
+
+/**
+ * @private Called when window loads
+ */
+exports.Shadow.prototype.handleWindowLoaded = function() {
+  this.handleViewportUpdate();
 };
 
 'use strict';
@@ -523,6 +557,92 @@ exports.StyleInjector.prototype.inject = function(css, doc) {
 
 'use strict';
 
+exports.Timing = function() {
+
+};
+
+/**
+ * Debounces a function to only be called once with a minimum delay
+ * of <code>delay</code>ms.
+ *
+ * Loosely based on http://remysharp.com/2010/07/21/throttling-function-calls/
+ *
+ * @param {Function} fnCallback The callback function
+ * @param {number} delay The delay in ms. Defaults to 0.
+ * @param {*} context The context to which to apply the function on.
+ *                    Defaults to this.
+ * @return {Function} The debounced function.
+ */
+exports.Timing.debounce = function(fnCallback, delay, context) {
+
+  var timeoutId = NaN;
+
+  return function() {
+    delay = delay || 0;
+    context = context || this;
+    var currentArguments = arguments;
+
+    if (!isNaN(timeoutId)) {
+      clearTimeout(timeoutId);
+    }
+
+    timeoutId = setTimeout(function() {
+      fnCallback.apply(context, currentArguments);
+    }, delay);
+  };
+};
+
+
+/**
+ * Throttles a function to only be called with a delay of <code>delay</code>ms.
+ *
+ * Will always execute the first time immediately.
+ *
+ * Loosely based on http://remysharp.com/2010/07/21/throttling-function-calls/
+ *
+ * @param {Function} fnCallback The callback function
+ * @param {number} delay The delay in ms. Defaults to 0.
+ * @param {*} context The context to which to apply the function on.
+ *                    Defaults to this.
+ * @return {Function} The throttled function.
+ */
+exports.Timing.throttle = function(fnCallback, delay, context) {
+
+  var previousTimestamp = NaN;
+  var timeoutId = NaN;
+
+  return function() {
+    delay = delay || 0;
+    context = context || this;
+
+    // requires performance.now() polyfill
+    var currentTimestamp = window.performance.now();
+    var currentArguments = arguments;
+
+    if (!isNaN(previousTimestamp) && currentTimestamp < previousTimestamp +
+      delay) {
+      // clear if we haven't waited long enough
+      if (!isNaN(timeoutId)) {
+        clearTimeout(timeoutId);
+      }
+
+      // delay execution by delay ms
+      timeoutId = setTimeout(function() {
+        previousTimestamp = currentTimestamp;
+        fnCallback.apply(context, currentArguments);
+      }, delay);
+    } else {
+      if (!isNaN(timeoutId)) {
+        clearTimeout(timeoutId);
+      }
+      previousTimestamp = currentTimestamp;
+      fnCallback.apply(context, currentArguments);
+    }
+  };
+};
+
+'use strict';
+
 /**
  * Creates a new Shine instance for one dom element.
  *
@@ -565,6 +685,10 @@ exports.Shine = function(domElement, optConfig, optClassPrefix, optShadowPropert
  */
 exports.Shine.prototype.destroy = function() {
   this.disableAutoUpdates();
+
+  for (var i = this.shadows.length - 1; i >= 0; i--) {
+    this.shadows[i].destroy();
+  }
 
   this.light = null;
   this.shadows = null;

@@ -281,7 +281,7 @@ pre {
         padding-bottom: 10em; } }
 
 .large {
-  font-size: 4.5em;
+  font-size: 4em;
   font-weight: 700;
   font-family: Helvetica, sans-serif;
   letter-spacing: -0.04em;
@@ -310,6 +310,10 @@ pre {
     .medium {
       font-size: 3em; } }
 
+.shine {
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0); }
+
 .light {
   color: #3c3c3c; }
   .light.shine,
@@ -324,6 +328,15 @@ pre {
   .dark .shine,
   .dark .highlight {
     color: #3c3c3c; }
+
+/*
+ * Hide dat.gui on mobile/tablet
+ */
+.dg.ac {
+  display: none; }
+  @media screen and (min-width: 40em) {
+    .dg.ac {
+      display: block; } }
 
 .container {
   *zoom: 1;

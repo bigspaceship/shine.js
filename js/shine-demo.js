@@ -13,6 +13,8 @@ function ShineDemo() {
   this.gui = null;
   this.shines = null;
   this.lightPosition = new shinejs.Point();
+
+  this.requiresRedraw = false;
 }
 
 ShineDemo.prototype.init = function() {
@@ -20,8 +22,9 @@ ShineDemo.prototype.init = function() {
   this.initShines();
   this.initExampleLinks();
 
-  window.addEventListener('resize', this.draw.bind(this), false);
-  window.addEventListener('scroll', this.draw.bind(this), false);
+  var fnDraw = shinejs.Timing.throttle(this.draw, 1000/30, this);
+  window.addEventListener('resize', fnDraw, false);
+  window.addEventListener('scroll', fnDraw, false);
 
   if ('onorientationchange' in window) {
     window.addEventListener('deviceorientation', this.handleOrientationChange.bind(this), false);
@@ -91,7 +94,7 @@ ShineDemo.prototype.destroyShines = function() {
   this.shines = null;
 };
 
-ShineDemo.prototype.draw = function () {
+ShineDemo.prototype.draw = function() {
   var top = 0;
   var bottom = window.innerHeight;
 
@@ -104,12 +107,21 @@ ShineDemo.prototype.draw = function () {
       this.shines[i].draw();
     }
   }
+
+  this.requiresRedraw = false;
+};
+
+ShineDemo.prototype.queueRedraw = function() {
+  if (!this.requiresRedraw) {
+    this.requiresRedraw = true;
+    window.requestAnimationFrame(this.draw.bind(this));
+  }
 };
 
 ShineDemo.prototype.handleMouseMove = function(event) {
   this.lightPosition.x = event.clientX;
   this.lightPosition.y = event.clientY;
-  this.draw();
+  this.queueRedraw();
 };
 
 ShineDemo.prototype.handleOrientationChange = function(event) {
@@ -124,7 +136,7 @@ ShineDemo.prototype.handleOrientationChange = function(event) {
 
   this.lightPosition.x = radiusX + x;
   this.lightPosition.y = radiusY + y;
-  this.draw();
+  this.queueRedraw();
 };
 
 ShineDemo.prototype.handleColorUpdates = function(event) {
