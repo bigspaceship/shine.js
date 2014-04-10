@@ -1,4 +1,4 @@
-/*! shine.js - v0.2.1 - 2014-04-09
+/*! shine.js - v0.2.3 - 2014-04-10
 * http://bigspaceship.github.io/shine.js
 * Copyright (c) 2014 Big Spaceship; Licensed MIT */
 /* jshint ignore:start */
@@ -207,9 +207,25 @@ exports.Shadow = function(domElement) {
    * @type {Function}
    */
   this.fnHandleViewportUpdate = null;
+  this.fnHandleWindowLoaded = this.handleWindowLoaded.bind(this);
 
   this.enableAutoUpdates();
   this.handleViewportUpdate();
+
+  // this.fnHandleViewportUpdate will get set in enableAutoUpdates();
+  window.addEventListener('load', this.fnHandleWindowLoaded, false);
+};
+
+/**
+ * Removes all listeners and frees resources.
+ * Destroyed instances can't be reused.
+ */
+exports.Shadow.prototype.destroy = function() {
+  window.removeEventListener('load', this.fnHandleWindowLoaded, false);
+  this.disableAutoUpdates();
+  this.fnHandleWindowLoaded = null;
+  this.domElement = null;
+  this.position = null;
 };
 
 /**
@@ -277,7 +293,6 @@ exports.Shadow.prototype.enableAutoUpdates = function() {
     this.handleViewportUpdate.bind(this);
 
   document.addEventListener('resize', fnHandleViewportUpdate, false);
-  window.addEventListener('load', fnHandleViewportUpdate, false);
   window.addEventListener('resize', fnHandleViewportUpdate, false);
   window.addEventListener('scroll', fnHandleViewportUpdate, false);
 };
@@ -298,7 +313,6 @@ exports.Shadow.prototype.disableAutoUpdates = function() {
   this.fnHandleViewportUpdate = null;
 
   document.removeEventListener('resize', fnHandleViewportUpdate, false);
-  window.removeEventListener('load', fnHandleViewportUpdate, false);
   window.removeEventListener('resize', fnHandleViewportUpdate, false);
   window.removeEventListener('scroll', fnHandleViewportUpdate, false);
 };
@@ -310,6 +324,13 @@ exports.Shadow.prototype.handleViewportUpdate = function() {
   var boundingRect = this.domElement.getBoundingClientRect();
   this.position.x = boundingRect.left + boundingRect.width * 0.5;
   this.position.y = boundingRect.top + boundingRect.height * 0.5;
+};
+
+/**
+ * @private Called when window loads
+ */
+exports.Shadow.prototype.handleWindowLoaded = function() {
+  this.handleViewportUpdate();
 };
 
 'use strict';
@@ -565,6 +586,10 @@ exports.Shine = function(domElement, optConfig, optClassPrefix, optShadowPropert
  */
 exports.Shine.prototype.destroy = function() {
   this.disableAutoUpdates();
+
+  for (var i = this.shadows.length - 1; i >= 0; i--) {
+    this.shadows[i].destroy();
+  }
 
   this.light = null;
   this.shadows = null;
