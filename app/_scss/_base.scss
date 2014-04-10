@@ -59,7 +59,7 @@ pre {
 }
 
 .large {
-  font-size: 4.5em;
+  font-size: 4em;
   font-weight: $heavy-font-weight;
   font-family: $sans-serif-condensed;
 
@@ -67,8 +67,6 @@ pre {
   line-height: 1.0em;
   padding: 0 0.025em;
   margin-bottom: 0.1em;
-
-  // text-transform: uppercase;
 
   @include media($medium-screen-up) {
     font-size: 10em;
@@ -96,6 +94,10 @@ pre {
   }
 }
 
+.shine {
+  transform: translateZ(0);
+}
+
 .light {
   color: $offdark-gray;
 
@@ -114,5 +116,16 @@ pre {
   .shine,
   .highlight {
     color: $offdark-gray;
+  }
+}
+
+/*
+ * Hide dat.gui on mobile/tablet
+ */
+.dg.ac {
+  display: none;
+
+  @include media($medium-screen-up) {
+    display: block;
   }
 }
