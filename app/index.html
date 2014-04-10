@@ -22,9 +22,9 @@ title: shine.js
 {% highlight javascript %}var shine = new Shine(document.getElementById('my-shine-object'));{% endhighlight %}
     <p>Change the light position:</p>
 {% highlight javascript %}window.addEventListener('mousemove', function(event) {
-shine.light.position.x = event.clientX;
-shine.light.position.y = event.clientY;
-shine.draw();
+  shine.light.position.x = event.clientX;
+  shine.light.position.y = event.clientY;
+  shine.draw();
 }, false);{% endhighlight %}
     <h3>Features</h3>
     <ul class="default-ul">
