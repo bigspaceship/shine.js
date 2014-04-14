@@ -333,7 +333,6 @@ exports.Shadow.prototype.disableAutoUpdates = function() {
  * @private Called when DOM event listeners fire
  */
 exports.Shadow.prototype.handleViewportUpdate = function() {
-  console.log('vp update');
   var boundingRect = this.domElement.getBoundingClientRect();
   this.position.x = boundingRect.left + boundingRect.width * 0.5;
   this.position.y = boundingRect.top + boundingRect.height * 0.5;
