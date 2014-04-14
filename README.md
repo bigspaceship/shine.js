@@ -1,6 +1,8 @@
 # shine.js
 
-*A library for pretty shadows.*
+A library for pretty shadows.
+
+See the working demo at [http://bigspaceship.github.io/shine.js/](http://bigspaceship.github.io/shine.js/).
 
 ## Get Started
 
