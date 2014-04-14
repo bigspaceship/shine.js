@@ -1,4 +1,4 @@
-/*! shine.js - v0.2.4 - 2014-04-10
+/*! shine.js - v0.2.5 - 2014-04-14
 * http://bigspaceship.github.io/shine.js
 * Copyright (c) 2014 Big Spaceship; Licensed MIT */
 /* jshint ignore:start */
@@ -333,7 +333,6 @@ exports.Shadow.prototype.disableAutoUpdates = function() {
  * @private Called when DOM event listeners fire
  */
 exports.Shadow.prototype.handleViewportUpdate = function() {
-  console.log('vp update');
   var boundingRect = this.domElement.getBoundingClientRect();
   this.position.x = boundingRect.left + boundingRect.width * 0.5;
   this.position.y = boundingRect.top + boundingRect.height * 0.5;
