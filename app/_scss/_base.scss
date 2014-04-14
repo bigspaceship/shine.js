@@ -18,6 +18,16 @@ pre {
   }
 }
 
+.social {
+  text-align: center;
+
+  li {
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 1em;
+  }
+}
+
 .highlight {
   padding: 0.5em 0;
   margin: 0 0 ($base-line-height * .5);
