@@ -42,6 +42,7 @@ h2 {
   font-size: 2em; }
 
 h3 {
+  margin-top: 0.5em;
   font-size: 1.75em; }
 
 h4 {
@@ -249,6 +250,13 @@ pre {
   -webkit-overflow-scrolling: touch; }
   pre > * {
     -webkit-transform: translateZ(0px); }
+
+.social {
+  text-align: center; }
+  .social li {
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 1em; }
 
 .highlight {
   padding: 0.5em 0;
