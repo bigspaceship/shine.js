@@ -18,12 +18,11 @@ module.exports = function(grunt) {
       },
       dist: {
         src: [
+            'lib/util/**/*.js',
             'lib/namespace.js',
             'lib/amd.module.js',
-            'lib/function.bind.polyfill.js',
-            'lib/performance.now.polyfill.js',
             'lib/<%= pkg.name %>.*.js',
-            'lib/shine.js',
+            'lib/shine.js'
           ],
         dest: 'dist/<%= pkg.name %>.js'
       }

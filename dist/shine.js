@@ -1,6 +1,44 @@
 /*! shine.js - v0.2.6 - 2014-04-15
 * http://bigspaceship.github.io/shine.js
 * Copyright (c) 2014 Big Spaceship; Licensed MIT */
+/* jshint ignore:start */
+if (!Function.prototype.bind) {
+  Function.prototype.bind = function (oThis) {
+    if (typeof this !== "function") {
+      // closest thing possible to the ECMAScript 5 internal IsCallable function
+      throw new TypeError("Function.prototype.bind - what is trying to be bound is not callable");
+    }
+
+    var aArgs = Array.prototype.slice.call(arguments, 1),
+        fToBind = this,
+        fNOP = function () {},
+        fBound = function () {
+          return fToBind.apply(this instanceof fNOP && oThis
+                                 ? this
+                                 : oThis,
+                               aArgs.concat(Array.prototype.slice.call(arguments)));
+        };
+
+    fNOP.prototype = this.prototype;
+    fBound.prototype = new fNOP();
+
+    return fBound;
+  };
+}
+/* jshint ignore:end */
+
+'use strict';
+
+/**
+ * window.performance.now() polyfill
+ * @type {Object.<string, Function>}
+ */
+window.performance = window.performance || window.webkitPeformance || window.mozPeformance || {
+  'now': function(){
+    return new Date().getTime();
+  }
+};
+
 'use strict';
 
 /* jshint ignore:start */
