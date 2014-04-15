@@ -1,4 +1,4 @@
-/*! shine.js - v0.2.5 - 2014-04-14
+/*! shine.js - v0.2.6 - 2014-04-15
 * http://bigspaceship.github.io/shine.js
 * Copyright (c) 2014 Big Spaceship; Licensed MIT */
 /* jshint ignore:start */
@@ -282,7 +282,7 @@ exports.Shadow.prototype.draw = function(light, config) {
  */
 exports.Shadow.prototype.getShadow = function(colorRGB, opacity, offsetX, offsetY, blurRadius) {
   var color = 'rgba(' + colorRGB.r + ', ' + colorRGB.g + ', ' + colorRGB.b + ', ' + opacity + ')';
-  return color + ' ' + offsetX + 'px ' + offsetY + 'px ' + Math.round(blurRadius) + 'px';
+  return Math.round(offsetX) + 'px ' + Math.round(offsetY) + 'px ' + Math.round(blurRadius) + 'px ' + color;
 };
 
 /**
@@ -290,7 +290,12 @@ exports.Shadow.prototype.getShadow = function(colorRGB, opacity, offsetX, offset
  * @param {Array.<string>} shadows
  */
 exports.Shadow.prototype.drawShadows = function(shadows) {
-  this.domElement.style[this.shadowProperty] = shadows.join(', ');
+  if (this.shadowProperty.toLowerCase().indexOf('filter') === -1) {
+    this.domElement.style[this.shadowProperty] = shadows.join(', ');
+  } else {
+    var filter = 'drop-shadow(' + shadows.join(') drop-shadow(') + ')';
+    this.domElement.style[this.shadowProperty] = filter;
+  }
 };
 
 /**
@@ -344,6 +349,7 @@ exports.Shadow.prototype.handleViewportUpdate = function() {
 exports.Shadow.prototype.handleWindowLoaded = function() {
   this.handleViewportUpdate();
 };
+
 
 'use strict';
 
@@ -817,16 +823,15 @@ exports.Shine.prototype.getCSS = function() {
 /**
  * Prefixes a CSS property.
  * @protected
+ * @param {string} property The css property to prefix.
  * @return {string}
  */
 exports.Shine.prototype.getPrefixed = function(property) {
   var element = this.domElement || document.createElement('div');
   var style = element.style;
 
-  if (property in style) {
-    return property;
-  }
-
+  // bb: prioritize prefixed properties over non-prefixed to prevent usage
+  // of placeholders (e.g. 'filter' in webkit is defined but does nothing)
   var prefixes = ['webkit', 'ms', 'Moz', 'Webkit', 'O'];
   var suffix = property.charAt(0).toUpperCase() + property.substring(1);
 
@@ -838,6 +843,33 @@ exports.Shine.prototype.getPrefixed = function(property) {
   }
 
   return property;
+};
+
+/**
+ * Checks if a CSS property is supported in the current browser. Tests available
+ * prefixes automatically.
+ *
+ * Example: <code>isCSSPropertySupported('filter', 'blur(2px)')</code>.
+ *
+ * @protected
+ * @param {string} property The css property to test against.
+ * @param {string} testValue The css property to test against.
+ * @return {boolean}
+ */
+exports.Shine.prototype.isCSSPropertySupported = function(property, testValue) {
+  var element = document.createElement('div');
+  var style = element.style;
+  var prefixes = ['-webkit-', '-ms-', '-moz-'];
+  style.cssText = prefixes.join(property + ':' + testValue + ';');
+  return !!style.length && ((document.documentMode === undefined || document.documentMode > 9));
+};
+
+/**
+ * Checks if CSS filters (e.g. drop-shadow/blur) are supported.
+ * @return {boolean}
+ */
+exports.Shine.prototype.areFiltersSupported = function() {
+  return this.isCSSPropertySupported('filter', 'blur(2px)');
 };
 
 /**
