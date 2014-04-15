@@ -5,22 +5,41 @@
     <link href="css/demo.css" rel="stylesheet" type="text/css">
     <script type="text/javascript" src="../dist/shine.min.js"></script>
   </head>
-  <body>
+  <body style="height:1000px">
 
-    <h1 id="headline" class="demo-text">Shine Mouse-Follow Demo</h1>
+    <h1 id="headline" class="demo-text" style="position:relative;top:250px;">Shine Mouse-Follow Demo</h1>
 
     <script type="text/javascript">
       // use new shinejs.Shine(...) if Shine is already defined somewhere else
       // var shine = new shinejs.Shine(document.getElementById('headline'));
       var shine = new Shine(document.getElementById('headline'));
-
+	  
+	  //use 'cursor' to bind light source to cursor or 'scroll' to bind to the scroll position
+	  var useMouseOrScroll = 'scroll';
+	  
+	  if (useMouseOrScroll === 'scroll'){
+        shine.light.position.x = window.innerWidth/2;
+	    shine.light.position.y = document.body.scrollTop;
+	    shine.draw();
+	  }
+	  
       function handleMouseMove(event) {
-        shine.light.position.x = event.clientX;
-        shine.light.position.y = event.clientY;
-        shine.draw();
-      }
-
-      window.addEventListener('mousemove', handleMouseMove, false);
+        if (useMouseOrScroll === 'scroll') {
+	      shine.light.position.x = window.innerWidth/2;
+	      shine.light.position.y = document.body.scrollTop;
+	      shine.draw();
+        } else {
+	      shine.light.position.x = event.clientX;
+		  shine.light.position.y = event.clientY;
+		  shine.draw();
+        }
+     }
+	  
+	  if (useMouseOrScroll === 'scroll') {
+	      window.addEventListener('scroll', handleMouseMove, false);
+	  } else {
+		  window.addEventListener('mousemove', handleMouseMove, false);
+	  }
     </script>
   </body>
 </html>
