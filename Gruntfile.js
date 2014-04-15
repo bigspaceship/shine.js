@@ -18,8 +18,9 @@ module.exports = function(grunt) {
       },
       dist: {
         src: [
-            'lib/function.bind.polyfill.js',
-            'lib/performance.now.polyfill.js',
+            'lib/util/**/*.js',
+            'lib/namespace.js',
+            'lib/amd.module.js',
             'lib/<%= pkg.name %>.*.js',
             'lib/shine.js'
           ],
@@ -56,7 +57,8 @@ module.exports = function(grunt) {
         unused: true,
         strict: true,
         trailing: true,
-        smarttabs: true
+        smarttabs: true,
+        predef: ['shinejs', 'shinejsGlobal']
       },
       gruntfile: {
         src: 'Gruntfile.js'

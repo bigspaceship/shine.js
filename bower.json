@@ -1,16 +1,14 @@
 {
   "name": "shine",
   "title": "shine.js",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "authors": [
     "Benjamin Bojko <benjaminbojko.com>"
   ],
   "copyright": "Big Spaceship",
-  "licenses": [
-    {
-      "type": "MIT"
-    }
-  ],
+  "licenses": [{
+    "type": "MIT"
+  }],
   "description": "Cast realistic shadows from your HTML elements",
   "main": "dist/shine.min.js",
   "moduleType": [
