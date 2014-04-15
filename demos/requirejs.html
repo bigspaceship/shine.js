@@ -1,0 +1,18 @@
+<html>
+  <head>
+    <title>Shine Demo</title>
+    <link href="http://fonts.googleapis.com/css?family=Open+Sans:800" rel="stylesheet" type="text/css">
+    <link href="css/demo.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+
+    <h1 id="headline" class="demo-text">Shine requirejs demo with min build</h1>
+
+    <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.11/require.min.js"></script>
+    <script type="text/javascript">
+      require(["../dist/shine.min.js"], function(shinejs) {
+        var shine = new shinejs.Shine(document.getElementById('headline'));
+      });
+    </script>
+  </body>
+</html>

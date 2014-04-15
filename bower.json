@@ -6,11 +6,9 @@
     "Benjamin Bojko <benjaminbojko.com>"
   ],
   "copyright": "Big Spaceship",
-  "licenses": [
-    {
-      "type": "MIT"
-    }
-  ],
+  "licenses": [{
+    "type": "MIT"
+  }],
   "description": "Cast realistic shadows from your HTML elements",
   "main": "dist/shine.min.js",
   "moduleType": [
