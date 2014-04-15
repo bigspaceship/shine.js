@@ -1,43 +1,34 @@
-/*! shine.js - v0.2.5 - 2014-04-14
+/*! shine.js - v0.2.6 - 2014-04-15
 * http://bigspaceship.github.io/shine.js
 * Copyright (c) 2014 Big Spaceship; Licensed MIT */
+'use strict';
+
 /* jshint ignore:start */
-if (!Function.prototype.bind) {
-  Function.prototype.bind = function (oThis) {
-    if (typeof this !== "function") {
-      // closest thing possible to the ECMAScript 5 internal IsCallable function
-      throw new TypeError("Function.prototype.bind - what is trying to be bound is not callable");
-    }
+var shinejs;
+var shinejsGlobal;
 
-    var aArgs = Array.prototype.slice.call(arguments, 1),
-        fToBind = this,
-        fNOP = function () {},
-        fBound = function () {
-          return fToBind.apply(this instanceof fNOP && oThis
-                                 ? this
-                                 : oThis,
-                               aArgs.concat(Array.prototype.slice.call(arguments)));
-        };
-
-    fNOP.prototype = this.prototype;
-    fBound.prototype = new fNOP();
-
-    return fBound;
-  };
+// Wrap assigments in try/catch to support running unminified code
+try {
+  shinejs = shinejs || exports || {};
+} catch(error) {
+  shinejs = {};
+}
+try {
+  shinejsGlobal = shinejsGlobal || global || {};
+} catch(error) {
+  shinejsGlobal = {};
 }
 /* jshint ignore:end */
 
 'use strict';
 
-/**
- * window.performance.now() polyfill
- * @type {Object.<string, Function>}
- */
-window.performance = window.performance || window.webkitPeformance || window.mozPeformance || {
-  'now': function(){
-    return new Date().getTime();
-  }
-};
+/* jshint ignore:start */
+if (typeof define !== 'undefined' && define.amd) {
+ define([], function() {
+   return shinejs;
+ });
+}
+/* jshint ignore:end */
 
 'use strict';
 
@@ -47,7 +38,7 @@ window.performance = window.performance || window.webkitPeformance || window.moz
  * @param {number=} g 0...255
  * @param {number=} b 0...255
  */
-exports.Color = function(r, g, b) {
+shinejs.Color = function(r, g, b) {
   /**
    * @type {number}
    */
@@ -65,10 +56,10 @@ exports.Color = function(r, g, b) {
 /**
  * Creates a new color instance from a hex string.
  * @param {string} hex E.g. #ff0000 for red
- * @return {exports.Color}
+ * @return {shinejs.Color}
  */
-exports.Color.colorFromHex = function(hex) {
-  var c = new exports.Color();
+shinejs.Color.colorFromHex = function(hex) {
+  var c = new shinejs.Color();
   c.parseHex(hex);
   return c;
 };
@@ -77,7 +68,7 @@ exports.Color.colorFromHex = function(hex) {
  * Assigns r, g and b from a hex string.
  * @param {string} hex E.g. #ff0000 for red
  */
-exports.Color.prototype.parseHex = function(hex) {
+shinejs.Color.prototype.parseHex = function(hex) {
   hex = hex.replace('#', '');
   var color = parseInt(hex, 16);
   this.r = (color >> 16) & 0xff;
@@ -89,7 +80,7 @@ exports.Color.prototype.parseHex = function(hex) {
  * Returns an rgba string.
  * @return {string} E.g. rgba(255, 0, 0, 1.0) for red
  */
-exports.Color.prototype.getRGBAString = function() {
+shinejs.Color.prototype.getRGBAString = function() {
   return 'rgba(' +
     Math.round(this.r) + ',' +
     Math.round(this.g) + ',' +
@@ -116,7 +107,7 @@ exports.Color.prototype.getRGBAString = function() {
  *  * blurPow
  *  * shadowRGB
  */
-exports.Config = function(optSettings) {
+shinejs.Config = function(optSettings) {
   /** @type {number} */
   this.numSteps = 5;
 
@@ -135,8 +126,8 @@ exports.Config = function(optSettings) {
   /** @type {number} */
   this.blurPow = 1.0;
 
-  /** @type {!exports.Color} */
-  this.shadowRGB = new exports.Color(0, 0, 0);
+  /** @type {!shinejs.Color} */
+  this.shadowRGB = new shinejs.Color(0, 0, 0);
 
   this.applyValues(optSettings);
 };
@@ -145,7 +136,7 @@ exports.Config = function(optSettings) {
  * Extends this instance with all valid values from <code>settings</code>.
  * @param {?Object=} settings An object containing the properties to override.
  */
-exports.Config.prototype.applyValues = function(settings) {
+shinejs.Config.prototype.applyValues = function(settings) {
   if (!settings) {
     return;
   }
@@ -161,13 +152,13 @@ exports.Config.prototype.applyValues = function(settings) {
 
 /**
  * @constructor
- * @param {?exports.Point=} optPosition An optional position. Defaults to (0, 0).
+ * @param {?shinejs.Point=} optPosition An optional position. Defaults to (0, 0).
  */
-exports.Light = function Light(optPosition) {
+shinejs.Light = function Light(optPosition) {
   /**
-   * @type {exports.Point}
+   * @type {shinejs.Point}
    */
-  this.position = optPosition || new exports.Point(0, 0);
+  this.position = optPosition || new shinejs.Point(0, 0);
 
   /**
    * @type {number}
@@ -182,7 +173,7 @@ exports.Light = function Light(optPosition) {
  * @param {number=} x
  * @param {number=} y
  */
-exports.Point = function(x, y) {
+shinejs.Point = function(x, y) {
   /** @type {number} */
   this.x = x || 0;
   /** @type {number} */
@@ -191,11 +182,11 @@ exports.Point = function(x, y) {
 
 /**
  * A point representing the x and y distance to a point <code>p</code>
- * @param {exports.Point} p
- * @return {exports.Point} A new instance of exports.Point
+ * @param {shinejs.Point} p
+ * @return {shinejs.Point} A new instance of shinejs.Point
  */
-exports.Point.prototype.delta = function(p) {
-  return new exports.Point(p.x - this.x, p.y - this.y);
+shinejs.Point.prototype.delta = function(p) {
+  return new shinejs.Point(p.x - this.x, p.y - this.y);
 };
 
 'use strict';
@@ -204,9 +195,9 @@ exports.Point.prototype.delta = function(p) {
  * @constructor
  * @param {!HTMLElement} domElement
  */
-exports.Shadow = function(domElement) {
-  /** @type {!exports.Point} */
-  this.position = new exports.Point(0, 0);
+shinejs.Shadow = function(domElement) {
+  /** @type {!shinejs.Point} */
+  this.position = new shinejs.Point(0, 0);
   /** @type {!HTMLElement} */
   this.domElement = domElement;
 
@@ -231,7 +222,7 @@ exports.Shadow = function(domElement) {
  * Removes all listeners and frees resources.
  * Destroyed instances can't be reused.
  */
-exports.Shadow.prototype.destroy = function() {
+shinejs.Shadow.prototype.destroy = function() {
   window.removeEventListener('load', this.fnHandleWindowLoaded, false);
   this.disableAutoUpdates();
   this.fnHandleWindowLoaded = null;
@@ -241,10 +232,10 @@ exports.Shadow.prototype.destroy = function() {
 
 /**
  * Draw this shadow with based on a light source
- * @param {exports.Light} light
+ * @param {shinejs.Light} light
  * @param {!Config} config
  */
-exports.Shadow.prototype.draw = function(light, config) {
+shinejs.Shadow.prototype.draw = function(light, config) {
 
   var delta = this.position.delta(light.position);
   var distance = Math.sqrt(delta.x * delta.x + delta.y * delta.y);
@@ -273,14 +264,14 @@ exports.Shadow.prototype.draw = function(light, config) {
 
 /**
  * Returns an individual shadow step for this caster
- * @param {exports.Color} colorRGB
+ * @param {shinejs.Color} colorRGB
  * @param {number} opacity
  * @param {number} offsetX
  * @param {number} offsetY
  * @param {number} blurRadius
  * @return {string}
  */
-exports.Shadow.prototype.getShadow = function(colorRGB, opacity, offsetX, offsetY, blurRadius) {
+shinejs.Shadow.prototype.getShadow = function(colorRGB, opacity, offsetX, offsetY, blurRadius) {
   var color = 'rgba(' + colorRGB.r + ', ' + colorRGB.g + ', ' + colorRGB.b + ', ' + opacity + ')';
   return color + ' ' + offsetX + 'px ' + offsetY + 'px ' + Math.round(blurRadius) + 'px';
 };
@@ -289,19 +280,19 @@ exports.Shadow.prototype.getShadow = function(colorRGB, opacity, offsetX, offset
  * Applies shadows to the DOM element
  * @param {Array.<string>} shadows
  */
-exports.Shadow.prototype.drawShadows = function(shadows) {
+shinejs.Shadow.prototype.drawShadows = function(shadows) {
   this.domElement.style[this.shadowProperty] = shadows.join(', ');
 };
 
 /**
  * Adds DOM event listeners for resize, scroll and load
  */
-exports.Shadow.prototype.enableAutoUpdates = function() {
+shinejs.Shadow.prototype.enableAutoUpdates = function() {
   this.disableAutoUpdates();
 
   // store reference fore more efficient minification
   var fnHandleViewportUpdate = this.fnHandleViewportUpdate =
-    exports.Timing.debounce(this.handleViewportUpdate, 1000/15, this);
+    shinejs.Timing.debounce(this.handleViewportUpdate, 1000/15, this);
     // this.handleViewportUpdate.bind(this);
 
   document.addEventListener('resize', fnHandleViewportUpdate, false);
@@ -312,7 +303,7 @@ exports.Shadow.prototype.enableAutoUpdates = function() {
 /**
  * Removes DOM event listeners for resize, scroll and load
  */
-exports.Shadow.prototype.disableAutoUpdates = function() {
+shinejs.Shadow.prototype.disableAutoUpdates = function() {
 
   // store reference fore more efficient minification
   var fnHandleViewportUpdate = this.fnHandleViewportUpdate;
@@ -332,7 +323,7 @@ exports.Shadow.prototype.disableAutoUpdates = function() {
 /**
  * @private Called when DOM event listeners fire
  */
-exports.Shadow.prototype.handleViewportUpdate = function() {
+shinejs.Shadow.prototype.handleViewportUpdate = function() {
   var boundingRect = this.domElement.getBoundingClientRect();
   this.position.x = boundingRect.left + boundingRect.width * 0.5;
   this.position.y = boundingRect.top + boundingRect.height * 0.5;
@@ -341,7 +332,7 @@ exports.Shadow.prototype.handleViewportUpdate = function() {
 /**
  * @private Called when window loads
  */
-exports.Shadow.prototype.handleWindowLoaded = function() {
+shinejs.Shadow.prototype.handleWindowLoaded = function() {
   this.handleViewportUpdate();
 };
 
@@ -354,7 +345,7 @@ exports.Shadow.prototype.handleWindowLoaded = function() {
  * @param {!HTMLElement} domElement
  * @param {?string=} optClassPrefix
  */
-exports.Splitter = function(domElement, optClassPrefix) {
+shinejs.Splitter = function(domElement, optClassPrefix) {
   /**
    * @type {!HTMLElement}
    */
@@ -396,7 +387,7 @@ exports.Splitter = function(domElement, optClassPrefix) {
  * @param {?boolean=} preserveChildren Preserves the nodes children as opposed
  *                                     to converting its content to text-only.
  */
-exports.Splitter.prototype.split = function(optText, preserveChildren) {
+shinejs.Splitter.prototype.split = function(optText, preserveChildren) {
 
   this.text = optText || this.text;
   this.wordElements.length = 0;
@@ -423,7 +414,7 @@ exports.Splitter.prototype.split = function(optText, preserveChildren) {
  * @param {HTMLElement} wrapperElement
  * @param {string} classPrefix
  */
-exports.Splitter.prototype.splitChildren = function(domElement, maskElement, wrapperElement, classPrefix) {
+shinejs.Splitter.prototype.splitChildren = function(domElement, maskElement, wrapperElement, classPrefix) {
   var childNodes = domElement.childNodes;
 
   for (var i = 0; i < childNodes.length; i++) {
@@ -452,7 +443,7 @@ exports.Splitter.prototype.splitChildren = function(domElement, maskElement, wra
  * @param {HTMLElement} wrapperElement
  * @param {string} classPrefix
  */
-exports.Splitter.prototype.splitText = function(domElement, maskElement, wrapperElement, classPrefix) {
+shinejs.Splitter.prototype.splitText = function(domElement, maskElement, wrapperElement, classPrefix) {
   var text = domElement.textContent;
   var numLetters = text.length;
   var wordElement = null;
@@ -503,25 +494,25 @@ exports.Splitter.prototype.splitText = function(domElement, maskElement, wrapper
 /**
  * @constructor
  */
-exports.StyleInjector = function() {
+shinejs.StyleInjector = function() {
   this.injections = {};
 };
 
 /**
- * @type {?exports.StyleInjector}
+ * @type {?shinejs.StyleInjector}
  */
-exports.StyleInjector.instance_ = null;
+shinejs.StyleInjector.instance_ = null;
 
 /**
  * Singleton
  *
- * @return {exports.StyleInjector}
+ * @return {shinejs.StyleInjector}
  */
-exports.StyleInjector.getInstance = function() {
-  if (!exports.StyleInjector.instance_) {
-    exports.StyleInjector.instance_ = new exports.StyleInjector();
+shinejs.StyleInjector.getInstance = function() {
+  if (!shinejs.StyleInjector.instance_) {
+    shinejs.StyleInjector.instance_ = new shinejs.StyleInjector();
   }
-  return exports.StyleInjector.instance_;
+  return shinejs.StyleInjector.instance_;
 };
 
 /**
@@ -531,7 +522,7 @@ exports.StyleInjector.getInstance = function() {
  * @param {HTMLDocument=} doc The document. Defaults to window.document
  * @return {HTMLStyleElement} The created style node.
  */
-exports.StyleInjector.prototype.inject = function(css, doc) {
+shinejs.StyleInjector.prototype.inject = function(css, doc) {
   doc = doc || window.document;
 
   // don't inject twice
@@ -556,7 +547,7 @@ exports.StyleInjector.prototype.inject = function(css, doc) {
 
 'use strict';
 
-exports.Timing = function() {
+shinejs.Timing = function() {
 
 };
 
@@ -572,7 +563,7 @@ exports.Timing = function() {
  *                    Defaults to this.
  * @return {Function} The debounced function.
  */
-exports.Timing.debounce = function(fnCallback, delay, context) {
+shinejs.Timing.debounce = function(fnCallback, delay, context) {
 
   var timeoutId = NaN;
 
@@ -605,7 +596,7 @@ exports.Timing.debounce = function(fnCallback, delay, context) {
  *                    Defaults to this.
  * @return {Function} The throttled function.
  */
-exports.Timing.throttle = function(fnCallback, delay, context) {
+shinejs.Timing.throttle = function(fnCallback, delay, context) {
 
   var previousTimestamp = NaN;
   var timeoutId = NaN;
@@ -655,13 +646,13 @@ exports.Timing.throttle = function(fnCallback, delay, context) {
  * @param {?string=} optShadowProperty Can be 'textShadow' or 'boxShadow'.
  *                                     Defaults to 'textShadow'.
  */
-exports.Shine = function(domElement, optConfig, optClassPrefix, optShadowProperty) {
+shinejs.Shine = function(domElement, optConfig, optClassPrefix, optShadowProperty) {
   if (!domElement) {
     throw new Error('No valid DOM element passed as first parameter');
   }
 
-  this.light = new exports.Light();
-  this.config = optConfig || new exports.Config();
+  this.light = new shinejs.Light();
+  this.config = optConfig || new shinejs.Config();
   this.domElement = domElement;
 
   this.classPrefix = optClassPrefix || 'shine-';
@@ -669,7 +660,7 @@ exports.Shine = function(domElement, optConfig, optClassPrefix, optShadowPropert
     (this.elememtHasTextOnly(domElement) ? 'textShadow' : 'boxShadow');
 
   this.shadows = [];
-  this.splitter = new exports.Splitter(domElement, this.classPrefix);
+  this.splitter = new shinejs.Splitter(domElement, this.classPrefix);
 
   this.areAutoUpdatesEnabled = true;
 
@@ -682,7 +673,7 @@ exports.Shine = function(domElement, optConfig, optClassPrefix, optShadowPropert
  * Releases all resources and removes event listeners. Destroyed instances
  * can't be reused and must be discarded.
  */
-exports.Shine.prototype.destroy = function() {
+shinejs.Shine.prototype.destroy = function() {
   this.disableAutoUpdates();
 
   for (var i = this.shadows.length - 1; i >= 0; i--) {
@@ -699,7 +690,7 @@ exports.Shine.prototype.destroy = function() {
 /**
  * Draws all shadows based on the current light position.
  */
-exports.Shine.prototype.draw = function() {
+shinejs.Shine.prototype.draw = function() {
   for (var i = this.shadows.length - 1; i >= 0; i--) {
     this.shadows[i].draw(this.light, this.config);
   }
@@ -715,11 +706,11 @@ exports.Shine.prototype.draw = function() {
  *                           not defined, the current textContent of domElement
  *                           will be used.
  */
-exports.Shine.prototype.updateContent = function(optText) {
+shinejs.Shine.prototype.updateContent = function(optText) {
   var wereAutoUpdatesEnabled = this.areAutoUpdatesEnabled;
   this.disableAutoUpdates();
 
-  exports.StyleInjector.getInstance().inject(this.getCSS());
+  shinejs.StyleInjector.getInstance().inject(this.getCSS());
 
   this.shadows.length = 0;
 
@@ -729,7 +720,7 @@ exports.Shine.prototype.updateContent = function(optText) {
 
   for (var j = 0; j < this.splitter.elements.length; j++) {
     var element = this.splitter.elements[j];
-    var shadow = new exports.Shadow(element);
+    var shadow = new shinejs.Shadow(element);
     shadow.shadowProperty = shadowProperty;
     this.shadows.push(shadow);
   }
@@ -743,7 +734,7 @@ exports.Shine.prototype.updateContent = function(optText) {
 /**
  * Adds DOM event listeners to automatically update all properties.
  */
-exports.Shine.prototype.enableAutoUpdates = function() {
+shinejs.Shine.prototype.enableAutoUpdates = function() {
   this.disableAutoUpdates();
   this.areAutoUpdatesEnabled = true;
 
@@ -761,7 +752,7 @@ exports.Shine.prototype.enableAutoUpdates = function() {
 /**
  * Removes DOM event listeners to automatically update all properties.
  */
-exports.Shine.prototype.disableAutoUpdates = function() {
+shinejs.Shine.prototype.disableAutoUpdates = function() {
   this.areAutoUpdatesEnabled = false;
 
   // store reference fore more efficient minification
@@ -787,7 +778,7 @@ exports.Shine.prototype.disableAutoUpdates = function() {
  * @protected
  * @return {string}
  */
-exports.Shine.prototype.getCSS = function() {
+shinejs.Shine.prototype.getCSS = function() {
   return '/* shine.js styles */' +
     '.shine-wrapper {' +
     ' display: inline-block;' +
@@ -817,16 +808,15 @@ exports.Shine.prototype.getCSS = function() {
 /**
  * Prefixes a CSS property.
  * @protected
+ * @param {string} property The css property to prefix.
  * @return {string}
  */
-exports.Shine.prototype.getPrefixed = function(property) {
+shinejs.Shine.prototype.getPrefixed = function(property) {
   var element = this.domElement || document.createElement('div');
   var style = element.style;
 
-  if (property in style) {
-    return property;
-  }
-
+  // bb: prioritize prefixed properties over non-prefixed to prevent usage
+  // of placeholders (e.g. 'filter' in webkit is defined but does nothing)
   var prefixes = ['webkit', 'ms', 'Moz', 'Webkit', 'O'];
   var suffix = property.charAt(0).toUpperCase() + property.substring(1);
 
@@ -841,12 +831,39 @@ exports.Shine.prototype.getPrefixed = function(property) {
 };
 
 /**
+ * Checks if a CSS property is supported in the current browser. Tests available
+ * prefixes automatically.
+ *
+ * Example: <code>isCSSPropertySupported('filter', 'blur(2px)')</code>.
+ *
+ * @protected
+ * @param {string} property The css property to test against.
+ * @param {string} testValue The css property to test against.
+ * @return {boolean}
+ */
+shinejs.Shine.prototype.isCSSPropertySupported = function(property, testValue) {
+  var element = document.createElement('div');
+  var style = element.style;
+  var prefixes = ['-webkit-', '-ms-', '-moz-'];
+  style.cssText = prefixes.join(property + ':' + testValue + ';');
+  return !!style.length && ((document.documentMode === undefined || document.documentMode > 9));
+};
+
+/**
+ * Checks if CSS filters (e.g. drop-shadow/blur) are supported.
+ * @return {boolean}
+ */
+shinejs.Shine.prototype.areFiltersSupported = function() {
+  return this.isCSSPropertySupported('filter', 'blur(2px)');
+};
+
+/**
  * Checks whether a DOM element only contains childNodes of type TEXT_NODE (3).
  * @protected
  * @param {HTMLElement} domElement
  * @return {boolean}
  */
-exports.Shine.prototype.elememtHasTextOnly = function(domElement) {
+shinejs.Shine.prototype.elememtHasTextOnly = function(domElement) {
   var childNodes = domElement.childNodes;
 
   if (!childNodes || childNodes.length === 0) {
@@ -864,6 +881,6 @@ exports.Shine.prototype.elememtHasTextOnly = function(domElement) {
 
 /**
  * @const
- * @type {exports.Shine}
+ * @type {shinejs.Shine}
  */
-global.Shine = global.Shine || exports.Shine;
+shinejsGlobal.Shine = shinejsGlobal.Shine || shinejs.Shine;
