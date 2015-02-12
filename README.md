@@ -4,7 +4,7 @@ A library for pretty shadows.
 
 See the working demo at [http://bigspaceship.github.io/shine.js/](http://bigspaceship.github.io/shine.js/).
 
-## Get Started
+## Get Started [![Inline docs](http://inch-ci.org/github/bigspaceship/shine.js.svg?branch=master)](http://inch-ci.org/github/bigspaceship/shine.js)
 
 Install using bower: `bower install shine` or [download as zip](https://github.com/bigspaceship/shine.js/archive/master.zip) or [fork on GitHub](https://github.com/bigspaceship/shine.js).
 
