@@ -1,6 +1,6 @@
-/*! shine.js - v0.2.6 - 2014-04-15
+/*! shine.js - v0.2.7 - 2015-04-18
 * http://bigspaceship.github.io/shine.js
-* Copyright (c) 2014 Big Spaceship; Licensed MIT */
+* Copyright (c) 2015 Big Spaceship; Licensed MIT */
 /* jshint ignore:start */
 if (!Function.prototype.bind) {
   Function.prototype.bind = function (oThis) {
@@ -454,9 +454,11 @@ shinejs.Splitter.prototype.split = function(optText, preserveChildren) {
  */
 shinejs.Splitter.prototype.splitChildren = function(domElement, maskElement, wrapperElement, classPrefix) {
   var childNodes = domElement.childNodes;
+  var childNodesLength = childNodes.length;
 
-  for (var i = 0; i < childNodes.length; i++) {
-    var child = childNodes[i];
+  for (var i = 0; i < childNodesLength; i++) {
+    
+    var child = childNodes[0];
     // see https://developer.mozilla.org/en-US/docs/Web/API/Node.nodeType
     if (child.nodeType !== 1) {
       continue;
