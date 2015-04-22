@@ -1,6 +1,6 @@
-/*! shine.js - v0.2.7 - 2014-04-15
+/*! shine.js - v0.2.7 - 2015-04-22
 * http://bigspaceship.github.io/shine.js
-* Copyright (c) 2014 Big Spaceship; Licensed MIT */
+* Copyright (c) 2015 Big Spaceship; Licensed MIT */
 /* jshint ignore:start */
 if (!Function.prototype.bind) {
   Function.prototype.bind = function (oThis) {
@@ -455,15 +455,17 @@ shinejs.Splitter.prototype.split = function(optText, preserveChildren) {
 shinejs.Splitter.prototype.splitChildren = function(domElement, maskElement, wrapperElement, classPrefix) {
   var childNodes = domElement.childNodes;
 
-  for (var i = 0; i < childNodes.length; i++) {
-    var child = childNodes[i];
-    // see https://developer.mozilla.org/en-US/docs/Web/API/Node.nodeType
-    if (child.nodeType !== 1) {
-      continue;
-    }
-    child.className += ' ' + classPrefix + 'letter';
-    wrapperElement.appendChild(child);
-    this.elements.push(child);
+  for (var i = childNodes.length - 1; i >= 0; i--) {
+   var child = childNodes[i];
+
+   // see https://developer.mozilla.org/en-US/docs/Web/API/Node.nodeType
+   if (child.nodeType !== 1) {
+     continue;
+   }
+
+   child.className += ' ' + classPrefix + 'letter';
+   wrapperElement.insertBefore(child, wrapperElement.firstChild);
+   this.elements.push(child);
   }
 
   maskElement.innerHTML = wrapperElement.innerHTML;
@@ -473,7 +475,6 @@ shinejs.Splitter.prototype.splitChildren = function(domElement, maskElement, wra
   domElement.innerHTML = '';
   domElement.appendChild(wrapperElement);
 };
-
 /**
  * Splits a DOM element into word and letter elements and masks them.
  * @param {HTMLElement} domElement
