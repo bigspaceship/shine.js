@@ -1,4 +1,4 @@
-/*! shine.js - v0.2.7 - 2015-04-22
+/*! shine.js - v0.2.8 - 2015-04-22
 * http://bigspaceship.github.io/shine.js
 * Copyright (c) 2015 Big Spaceship; Licensed MIT */
 /* jshint ignore:start */
