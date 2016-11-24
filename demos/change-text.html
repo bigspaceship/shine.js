@@ -6,6 +6,8 @@
     <script type="text/javascript" src="../dist/shine.min.js"></script>
   </head>
   <body>
+    <input type="text" id="customtext" placeholder="Custom Text..." autofocus />
+    <button id="textbtn">Custom Change</button>
     <button data-text="Shine Mouse-Follow Demo">Change Text</button>
     <button data-text="Hello World">Change Text</button>
     <button data-text="Lorem Ipsum">Change Text</button>
@@ -22,10 +24,18 @@
         shine.updateContent(text);
       }
 
+      function customText(event) {
+        var text = document.getElementById('customtext').value;
+        shine.updateContent(text);
+      }
+
       var textButtons = document.querySelectorAll('[data-text]');
       for (var i = 0; i < textButtons.length; i++) {
         textButtons[i].addEventListener('click', handleTextButtonClick, false);
       }
+
+      var customBtn = document.getElementById('textbtn');
+      customBtn.addEventListener('click', customText, false);
     </script>
   </body>
 </html>
