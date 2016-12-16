@@ -21,3 +21,9 @@
   letter-spacing: -0.02em;
   line-height: 1.2em;
 }
+
+@media print {
+  .shine-letter{
+    text-shadow: none!important;
+  }
+}
